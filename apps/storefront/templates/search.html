@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>{% if query %}Results for &ldquo;{{ query }}&rdquo;{% else %}Search{% endif %}</h1>
+{% if query and not books %}<p class="muted">Nothing matched that.</p>{% endif %}
+<div class="grid">
+  {% for book in books %}
+  <article class="card">
+    <a href="/books/{{ book.slug }}"><img src="{{ cover_url(book) }}" alt="{{ book.title }}"></a>
+    <h3><a href="/books/{{ book.slug }}">{{ book.title }}</a></h3>
+    <p class="author">{{ book.author }}</p>
+    <p class="price">from {{ book.price_from_cents | money }}</p>
+  </article>
+  {% endfor %}
+</div>
+{% endblock %}

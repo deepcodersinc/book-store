@@ -1,0 +1,525 @@
+[
+  {
+    "slug": "moby-dick",
+    "title": "Moby-Dick",
+    "author": "Herman Melville",
+    "published_year": 1851,
+    "description": "A whaling voyage becomes an obsessive hunt for the white whale that maimed its captain.",
+    "editions": [
+      {
+        "format": "paperback",
+        "price_cents": 1200,
+        "isbn": "978-1-4000-000-1",
+        "on_hand": 12
+      },
+      {
+        "format": "hardcover",
+        "price_cents": 2400,
+        "isbn": "978-1-4000-000-2",
+        "on_hand": 6
+      },
+      {
+        "format": "ebook",
+        "price_cents": 699,
+        "isbn": "978-1-4000-000-3",
+        "asset_path": "ebooks/moby-dick.pdf"
+      }
+    ]
+  },
+  {
+    "slug": "pride-and-prejudice",
+    "title": "Pride and Prejudice",
+    "author": "Jane Austen",
+    "published_year": 1813,
+    "description": "Elizabeth Bennet navigates manners, marriage and her own misjudgements in Regency England.",
+    "editions": [
+      {
+        "format": "paperback",
+        "price_cents": 1300,
+        "isbn": "978-1-4001-001-1",
+        "on_hand": 18
+      },
+      {
+        "format": "hardcover",
+        "price_cents": 2550,
+        "isbn": "978-1-4001-001-2",
+        "on_hand": 4
+      },
+      {
+        "format": "ebook",
+        "price_cents": 799,
+        "isbn": "978-1-4001-001-3"
+      }
+    ]
+  },
+  {
+    "slug": "frankenstein",
+    "title": "Frankenstein",
+    "author": "Mary Shelley",
+    "published_year": 1818,
+    "description": "A young scientist assembles a living creature and abandons it to a world that will not have it.",
+    "editions": [
+      {
+        "format": "paperback",
+        "price_cents": 1400,
+        "isbn": "978-1-4002-002-1",
+        "on_hand": 9
+      },
+      {
+        "format": "hardcover",
+        "price_cents": 2700,
+        "isbn": "978-1-4002-002-2",
+        "on_hand": 8
+      },
+      {
+        "format": "ebook",
+        "price_cents": 899,
+        "isbn": "978-1-4002-002-3",
+        "asset_path": "ebooks/frankenstein.pdf"
+      }
+    ]
+  },
+  {
+    "slug": "the-time-machine",
+    "title": "The Time Machine",
+    "author": "H. G. Wells",
+    "published_year": 1895,
+    "description": "An inventor travels forward to find humanity split into two uneasy descendants.",
+    "editions": [
+      {
+        "format": "paperback",
+        "price_cents": 1500,
+        "isbn": "978-1-4003-003-1",
+        "on_hand": 14
+      },
+      {
+        "format": "hardcover",
+        "price_cents": 2850,
+        "isbn": "978-1-4003-003-2",
+        "on_hand": 5
+      },
+      {
+        "format": "ebook",
+        "price_cents": 699,
+        "isbn": "978-1-4003-003-3",
+        "asset_path": "ebooks/the-time-machine.pdf"
+      }
+    ]
+  },
+  {
+    "slug": "jane-eyre",
+    "title": "Jane Eyre",
+    "author": "Charlotte Bronte",
+    "published_year": 1847,
+    "description": "An orphaned governess holds to her own conscience against considerable pressure.",
+    "editions": [
+      {
+        "format": "paperback",
+        "price_cents": 1600,
+        "isbn": "978-1-4004-004-1",
+        "on_hand": 11
+      },
+      {
+        "format": "hardcover",
+        "price_cents": 2400,
+        "isbn": "978-1-4004-004-2",
+        "on_hand": 7
+      },
+      {
+        "format": "ebook",
+        "price_cents": 799,
+        "isbn": "978-1-4004-004-3"
+      }
+    ]
+  },
+  {
+    "slug": "dracula",
+    "title": "Dracula",
+    "author": "Bram Stoker",
+    "published_year": 1897,
+    "description": "Letters and diaries assemble the account of a count moving from Transylvania to London.",
+    "editions": [
+      {
+        "format": "paperback",
+        "price_cents": 1200,
+        "isbn": "978-1-4005-005-1",
+        "on_hand": 15
+      },
+      {
+        "format": "hardcover",
+        "price_cents": 2550,
+        "isbn": "978-1-4005-005-2",
+        "on_hand": 9
+      },
+      {
+        "format": "ebook",
+        "price_cents": 899,
+        "isbn": "978-1-4005-005-3"
+      }
+    ]
+  },
+  {
+    "slug": "great-expectations",
+    "title": "Great Expectations",
+    "author": "Charles Dickens",
+    "published_year": 1861,
+    "description": "A blacksmith's apprentice comes into money and discovers where it came from.",
+    "editions": [
+      {
+        "format": "paperback",
+        "price_cents": 1300,
+        "isbn": "978-1-4006-006-1",
+        "on_hand": 7
+      },
+      {
+        "format": "hardcover",
+        "price_cents": 2700,
+        "isbn": "978-1-4006-006-2",
+        "on_hand": 3
+      },
+      {
+        "format": "ebook",
+        "price_cents": 699,
+        "isbn": "978-1-4006-006-3"
+      }
+    ]
+  },
+  {
+    "slug": "wuthering-heights",
+    "title": "Wuthering Heights",
+    "author": "Emily Bronte",
+    "published_year": 1847,
+    "description": "Two houses on the moors are wrecked across a generation by one unrelenting attachment.",
+    "editions": [
+      {
+        "format": "paperback",
+        "price_cents": 1400,
+        "isbn": "978-1-4007-007-1",
+        "on_hand": 10
+      },
+      {
+        "format": "hardcover",
+        "price_cents": 2850,
+        "isbn": "978-1-4007-007-2",
+        "on_hand": 2
+      },
+      {
+        "format": "ebook",
+        "price_cents": 799,
+        "isbn": "978-1-4007-007-3"
+      }
+    ]
+  },
+  {
+    "slug": "the-picture-of-dorian-gray",
+    "title": "The Picture of Dorian Gray",
+    "author": "Oscar Wilde",
+    "published_year": 1890,
+    "description": "A portrait ages and corrupts while its subject does not.",
+    "editions": [
+      {
+        "format": "paperback",
+        "price_cents": 1500,
+        "isbn": "978-1-4008-008-1",
+        "on_hand": 16
+      },
+      {
+        "format": "hardcover",
+        "price_cents": 2400,
+        "isbn": "978-1-4008-008-2",
+        "on_hand": 6
+      },
+      {
+        "format": "ebook",
+        "price_cents": 899,
+        "isbn": "978-1-4008-008-3"
+      }
+    ]
+  },
+  {
+    "slug": "treasure-island",
+    "title": "Treasure Island",
+    "author": "Robert Louis Stevenson",
+    "published_year": 1883,
+    "description": "A map found in a dead sailor's chest sends a boy to sea with a cook he should not trust.",
+    "editions": [
+      {
+        "format": "paperback",
+        "price_cents": 1600,
+        "isbn": "978-1-4009-009-1",
+        "on_hand": 13
+      },
+      {
+        "format": "hardcover",
+        "price_cents": 2550,
+        "isbn": "978-1-4009-009-2",
+        "on_hand": 5
+      },
+      {
+        "format": "ebook",
+        "price_cents": 699,
+        "isbn": "978-1-4009-009-3"
+      }
+    ]
+  },
+  {
+    "slug": "crime-and-punishment",
+    "title": "Crime and Punishment",
+    "author": "Fyodor Dostoevsky",
+    "published_year": 1866,
+    "description": "A destitute student tests a theory about extraordinary men and cannot live with the result.",
+    "editions": [
+      {
+        "format": "paperback",
+        "price_cents": 1200,
+        "isbn": "978-1-4010-010-1",
+        "on_hand": 8
+      },
+      {
+        "format": "hardcover",
+        "price_cents": 2700,
+        "isbn": "978-1-4010-010-2",
+        "on_hand": 7
+      },
+      {
+        "format": "ebook",
+        "price_cents": 799,
+        "isbn": "978-1-4010-010-3"
+      }
+    ]
+  },
+  {
+    "slug": "the-war-of-the-worlds",
+    "title": "The War of the Worlds",
+    "author": "H. G. Wells",
+    "published_year": 1898,
+    "description": "Cylinders land in Surrey and the machinery inside them does not negotiate.",
+    "editions": [
+      {
+        "format": "paperback",
+        "price_cents": 1300,
+        "isbn": "978-1-4011-011-1",
+        "on_hand": 17
+      },
+      {
+        "format": "hardcover",
+        "price_cents": 2850,
+        "isbn": "978-1-4011-011-2",
+        "on_hand": 4
+      },
+      {
+        "format": "ebook",
+        "price_cents": 899,
+        "isbn": "978-1-4011-011-3"
+      }
+    ]
+  },
+  {
+    "slug": "heart-of-darkness",
+    "title": "Heart of Darkness",
+    "author": "Joseph Conrad",
+    "published_year": 1899,
+    "description": "A river journey upcountry toward a trading agent who has stopped pretending.",
+    "editions": [
+      {
+        "format": "paperback",
+        "price_cents": 1400,
+        "isbn": "978-1-4012-012-1",
+        "on_hand": 12
+      },
+      {
+        "format": "hardcover",
+        "price_cents": 2400,
+        "isbn": "978-1-4012-012-2",
+        "on_hand": 8
+      },
+      {
+        "format": "ebook",
+        "price_cents": 699,
+        "isbn": "978-1-4012-012-3"
+      }
+    ]
+  },
+  {
+    "slug": "the-strange-case-of-dr-jekyll",
+    "title": "The Strange Case of Dr Jekyll and Mr Hyde",
+    "author": "Robert Louis Stevenson",
+    "published_year": 1886,
+    "description": "A lawyer investigates the hold a brutal stranger has over his respectable friend.",
+    "editions": [
+      {
+        "format": "paperback",
+        "price_cents": 1500,
+        "isbn": "978-1-4013-013-1",
+        "on_hand": 9
+      },
+      {
+        "format": "hardcover",
+        "price_cents": 2550,
+        "isbn": "978-1-4013-013-2",
+        "on_hand": 3
+      },
+      {
+        "format": "ebook",
+        "price_cents": 799,
+        "isbn": "978-1-4013-013-3"
+      }
+    ]
+  },
+  {
+    "slug": "emma",
+    "title": "Emma",
+    "author": "Jane Austen",
+    "published_year": 1815,
+    "description": "A young woman certain of her matchmaking gifts arranges everything badly.",
+    "editions": [
+      {
+        "format": "paperback",
+        "price_cents": 1600,
+        "isbn": "978-1-4014-014-1",
+        "on_hand": 14
+      },
+      {
+        "format": "hardcover",
+        "price_cents": 2700,
+        "isbn": "978-1-4014-014-2",
+        "on_hand": 6
+      },
+      {
+        "format": "ebook",
+        "price_cents": 899,
+        "isbn": "978-1-4014-014-3"
+      }
+    ]
+  },
+  {
+    "slug": "the-call-of-the-wild",
+    "title": "The Call of the Wild",
+    "author": "Jack London",
+    "published_year": 1903,
+    "description": "A stolen sled dog works north until the domestic part of him falls away.",
+    "editions": [
+      {
+        "format": "paperback",
+        "price_cents": 1200,
+        "isbn": "978-1-4015-015-1",
+        "on_hand": 6
+      },
+      {
+        "format": "hardcover",
+        "price_cents": 2850,
+        "isbn": "978-1-4015-015-2",
+        "on_hand": 9
+      },
+      {
+        "format": "ebook",
+        "price_cents": 699,
+        "isbn": "978-1-4015-015-3"
+      }
+    ]
+  },
+  {
+    "slug": "a-tale-of-two-cities",
+    "title": "A Tale of Two Cities",
+    "author": "Charles Dickens",
+    "published_year": 1859,
+    "description": "London and Paris through the Revolution, and one substitution at the end of it.",
+    "editions": [
+      {
+        "format": "paperback",
+        "price_cents": 1300,
+        "isbn": "978-1-4016-016-1",
+        "on_hand": 11
+      },
+      {
+        "format": "hardcover",
+        "price_cents": 2400,
+        "isbn": "978-1-4016-016-2",
+        "on_hand": 5
+      },
+      {
+        "format": "ebook",
+        "price_cents": 799,
+        "isbn": "978-1-4016-016-3"
+      }
+    ]
+  },
+  {
+    "slug": "the-adventures-of-sherlock-holmes",
+    "title": "The Adventures of Sherlock Holmes",
+    "author": "Arthur Conan Doyle",
+    "published_year": 1892,
+    "description": "Twelve cases from Baker Street, narrated by the doctor who shares the rooms.",
+    "editions": [
+      {
+        "format": "paperback",
+        "price_cents": 1400,
+        "isbn": "978-1-4017-017-1",
+        "on_hand": 15
+      },
+      {
+        "format": "hardcover",
+        "price_cents": 2550,
+        "isbn": "978-1-4017-017-2",
+        "on_hand": 7
+      },
+      {
+        "format": "ebook",
+        "price_cents": 899,
+        "isbn": "978-1-4017-017-3"
+      }
+    ]
+  },
+  {
+    "slug": "middlemarch",
+    "title": "Middlemarch",
+    "author": "George Eliot",
+    "published_year": 1871,
+    "description": "A provincial town, several marriages, and the gap between ambition and circumstance.",
+    "editions": [
+      {
+        "format": "paperback",
+        "price_cents": 1500,
+        "isbn": "978-1-4018-018-1",
+        "on_hand": 10
+      },
+      {
+        "format": "hardcover",
+        "price_cents": 2700,
+        "isbn": "978-1-4018-018-2",
+        "on_hand": 2
+      },
+      {
+        "format": "ebook",
+        "price_cents": 699,
+        "isbn": "978-1-4018-018-3"
+      }
+    ]
+  },
+  {
+    "slug": "the-invisible-man",
+    "title": "The Invisible Man",
+    "author": "H. G. Wells",
+    "published_year": 1897,
+    "description": "A stranger in bandages takes rooms at an inn and refuses to explain himself.",
+    "editions": [
+      {
+        "format": "paperback",
+        "price_cents": 1600,
+        "isbn": "978-1-4019-019-1",
+        "on_hand": 13
+      },
+      {
+        "format": "hardcover",
+        "price_cents": 2850,
+        "isbn": "978-1-4019-019-2",
+        "on_hand": 6
+      },
+      {
+        "format": "ebook",
+        "price_cents": 799,
+        "isbn": "978-1-4019-019-3"
+      }
+    ]
+  }
+]

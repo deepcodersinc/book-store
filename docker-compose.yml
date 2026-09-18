@@ -1,0 +1,53 @@
+# Production-like topology. Local development does not need any of this —
+# see the README for the two-command setup.
+
+services:
+  storefront:
+    build: .
+    command: uvicorn main:app --host 0.0.0.0 --port 8000
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql://bookstore:bookstore@postgres:5432/bookstore
+      STRIPE_API_KEY: ${STRIPE_API_KEY}
+      SENDGRID_API_KEY: ${SENDGRID_API_KEY}
+      S3_BUCKET: ${S3_BUCKET}
+      S3_ENDPOINT: http://minio:9000
+    depends_on:
+      - postgres
+      - redis
+      - minio
+
+  fulfillment-worker:
+    build: .
+    command: python -m tools.cli fulfil --loop
+    environment:
+      DATABASE_URL: postgresql://bookstore:bookstore@postgres:5432/bookstore
+      SENDGRID_API_KEY: ${SENDGRID_API_KEY}
+    depends_on:
+      - postgres
+
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: bookstore
+      POSTGRES_PASSWORD: bookstore
+      POSTGRES_DB: bookstore
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+
+  minio:
+    image: minio/minio
+    command: server /data
+    environment:
+      MINIO_ROOT_USER: bookstore
+      MINIO_ROOT_PASSWORD: bookstore
+    volumes:
+      - miniodata:/data
+
+volumes:
+  pgdata:
+  miniodata:

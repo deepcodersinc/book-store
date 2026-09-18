@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Edit: {{ book.title }}</h1>
+<nav class="admin-nav">
+  <a href="/admin">Overview</a><a href="/admin/books">Catalogue</a>
+  <a href="/admin/orders">Orders</a><a href="/admin/inventory">Stock</a>
+  <a href="/admin/outbox">Outbox</a><a href="/admin/jobs">Jobs</a>
+  <a href="/admin/audit">Audit</a><a href="/">Storefront</a>
+</nav>
+<form method="post" action="/admin/books/{{ book.slug }}" class="signin">
+  <label>Title <input type="text" name="title" value="{{ book.title }}"></label>
+  <label>Author <input type="text" name="author" value="{{ book.author }}"></label>
+  <label>Description <textarea name="description" rows="4">{{ book.description }}</textarea></label>
+  <button type="submit">Save</button>
+</form>
+<p class="muted">Saving writes an entry to the audit log.</p>
+{% endblock %}

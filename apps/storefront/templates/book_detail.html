@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}{{ book.title }} &mdash; Marginalia Books{% endblock %}
+{% block content %}
+<div class="detail">
+  <img class="detail-cover" src="{{ cover_url(book) }}" alt="{{ book.title }}">
+  <div>
+    <h1>{{ book.title }}</h1>
+    <p class="author">{{ book.author }}{% if book.published_year %} &middot; {{ book.published_year }}{% endif %}</p>
+    <p class="blurb">{{ book.description }}</p>
+    <h2>Editions</h2>
+    <table class="editions">
+      {% for edition in book.editions %}
+      <tr>
+        <td class="fmt">{{ edition.format.value | capitalize }}</td>
+        <td>{{ edition.price_cents | money }}</td>
+        <td class="stock">
+          {% if edition.format.value == 'ebook' %}<span class="ok">Instant download</span>
+          {% elif edition.in_stock %}<span class="ok">{{ edition.on_hand }} in stock</span>
+          {% else %}<span class="out">Out of stock</span>{% endif %}
+        </td>
+        <td>
+          <form method="post" action="/cart/add">
+            <input type="hidden" name="edition_id" value="{{ edition.id }}">
+            <button {% if not edition.in_stock %}disabled{% endif %}>Add to basket</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </table>
+  </div>
+</div>
+{% endblock %}

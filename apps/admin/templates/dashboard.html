@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Staff console</h1>
+<nav class="admin-nav">
+  <a href="/admin">Overview</a><a href="/admin/books">Catalogue</a>
+  <a href="/admin/orders">Orders</a><a href="/admin/inventory">Stock</a>
+  <a href="/admin/outbox">Outbox</a><a href="/admin/jobs">Jobs</a>
+  <a href="/admin/audit">Audit</a><a href="/">Storefront</a>
+</nav>
+<div class="stats">
+  <div class="stat"><span class="n">{{ book_count }}</span><span>titles</span></div>
+  <div class="stat"><span class="n">{{ orders | length }}</span><span>recent orders</span></div>
+  <div class="stat"><span class="n">{{ low_stock | length }}</span><span>low stock</span></div>
+  <div class="stat"><span class="n">{{ pending_jobs | length }}</span><span>queued jobs</span></div>
+</div>
+<h2>Latest orders</h2>
+<table class="lines">
+  <tr><th>Order</th><th>Status</th><th>Total</th><th>Pricing</th><th>Checkout</th></tr>
+  {% for o in orders %}
+  <tr><td><a href="/admin/orders/{{ o.order_number }}">{{ o.order_number }}</a></td>
+      <td>{{ o.status }}</td><td>{{ o.total_cents | money }}</td>
+      <td>{{ o.pricing_scheme }}</td><td>{{ o.checkout_version }}</td></tr>
+  {% endfor %}
+</table>
+{% if low_stock %}
+<h2>Needs reordering</h2>
+<ul>{% for row in low_stock %}<li>{{ row.title }} ({{ row.format }}) &mdash; {{ row.on_hand }} left</li>{% endfor %}</ul>
+{% endif %}
+{% endblock %}

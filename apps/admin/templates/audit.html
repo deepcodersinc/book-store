@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Audit log</h1>
+<nav class="admin-nav">
+  <a href="/admin">Overview</a><a href="/admin/books">Catalogue</a>
+  <a href="/admin/orders">Orders</a><a href="/admin/inventory">Stock</a>
+  <a href="/admin/outbox">Outbox</a><a href="/admin/jobs">Jobs</a>
+  <a href="/admin/audit">Audit</a><a href="/">Storefront</a>
+</nav>
+<table class="lines">
+  <tr><th>When</th><th>Actor</th><th>Action</th><th>Entity</th><th>Detail</th></tr>
+  {% for e in entries %}
+  <tr><td class="muted">{{ e.created_at }}</td><td>{{ e.actor }}</td>
+      <td>{{ e.action }}</td><td>{{ e.entity_type }} {{ e.entity_id }}</td>
+      <td class="muted">{{ e.detail }}</td></tr>
+  {% endfor %}
+</table>
+{% endblock %}

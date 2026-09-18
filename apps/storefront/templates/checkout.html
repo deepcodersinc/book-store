@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Checkout</h1>
+<div class="checkout">
+  <form method="post" action="/checkout">
+    <label>Email
+      <input type="email" name="email" required value="{{ customer.email if customer else '' }}">
+    </label>
+    <label>Country
+      <input type="text" name="country" maxlength="2" value="{{ country }}">
+    </label>
+    <button type="submit">Place order</button>
+    {% if not customer %}<p class="muted">Checking out as a guest.</p>{% endif %}
+  </form>
+  {% if quote %}
+  <aside class="totals">
+  <div><span>Subtotal</span><span>{{ quote.subtotal_cents | money }}</span></div>
+  {% if quote.discount_cents %}<div class="discount"><span>Discount</span><span>-{{ quote.discount_cents | money }}</span></div>{% endif %}
+  {% if quote.tax_cents %}<div><span>{{ quote.tax_label }}</span><span>{{ quote.tax_cents | money }}</span></div>{% endif %}
+  <div class="grand"><span>Total</span><span>{{ quote.total_cents | money }}</span></div>
+  {% for note in quote.notes %}<p class="note">{{ note }}</p>{% endfor %}
+  </aside>
+  {% endif %}
+</div>
+{% endblock %}

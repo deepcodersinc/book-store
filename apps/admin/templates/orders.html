@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Orders</h1>
+<nav class="admin-nav">
+  <a href="/admin">Overview</a><a href="/admin/books">Catalogue</a>
+  <a href="/admin/orders">Orders</a><a href="/admin/inventory">Stock</a>
+  <a href="/admin/outbox">Outbox</a><a href="/admin/jobs">Jobs</a>
+  <a href="/admin/audit">Audit</a><a href="/">Storefront</a>
+</nav>
+<table class="lines">
+  <tr><th>Order</th><th>Email</th><th>Status</th><th>Total</th><th>Country</th><th>Pricing</th><th>Checkout</th></tr>
+  {% for o in orders %}
+  <tr><td><a href="/admin/orders/{{ o.order_number }}">{{ o.order_number }}</a></td>
+      <td>{{ o.email }}</td><td>{{ o.status }}</td>
+      <td>{{ o.total_cents | money }}</td><td>{{ o.country_code }}</td>
+      <td>{{ o.pricing_scheme }}</td><td>{{ o.checkout_version }}</td></tr>
+  {% endfor %}
+</table>
+{% endblock %}

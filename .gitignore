@@ -1,0 +1,14 @@
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+*.egg-info/
+
+# Generated at runtime from seed/books.json
+bookstore.db
+bookstore.db-journal
+
+.idea/
+.vscode/
+.DS_Store

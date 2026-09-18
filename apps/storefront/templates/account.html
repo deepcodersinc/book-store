@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>{{ customer.name }}</h1>
+<p class="muted">{{ customer.email }} &middot; {{ customer.country_code }}
+  {% if legacy %}&middot; <span class="tag">legacy pricing</span>{% endif %}</p>
+<h2>Orders</h2>
+{% if not orders %}<p class="muted">No orders yet.</p>{% endif %}
+<table class="lines">
+  {% for o in orders %}
+  <tr><td><a href="/orders/{{ o.order_number }}">{{ o.order_number }}</a></td>
+      <td>{{ o.status }}</td><td>{{ o.total_cents | money }}</td>
+      <td class="muted">{{ o.created_at }}</td></tr>
+  {% endfor %}
+</table>
+{% endblock %}

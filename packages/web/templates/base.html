@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Marginalia Books{% endblock %}</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="/">Marginalia<span>Books</span></a>
+    <form class="search" action="/search" method="get">
+      <input type="search" name="q" placeholder="Search titles and authors" value="{{ query or '' }}">
+      <button type="submit">Search</button>
+    </form>
+    <nav>
+      {% if customer %}
+        <a href="/account">{{ customer.name.split(' ')[0] }}</a>
+        <form method="post" action="/logout" class="inline"><button class="link">Sign out</button></form>
+      {% else %}
+        <a href="/login">Sign in</a>
+      {% endif %}
+      <a class="cart-link" href="/cart">Basket{% if cart and cart.item_count %} <span class="badge">{{ cart.item_count }}</span>{% endif %}</a>
+    </nav>
+  </header>
+
+  {% if notice %}<div class="notice">{{ notice }}</div>{% endif %}
+  {% if error %}<div class="notice error">{{ error }}</div>{% endif %}
+
+  <main>{% block content %}{% endblock %}</main>
+
+  <footer>
+    <span>Marginalia Books — a demonstration storefront.</span>
+    <a href="/admin">Staff</a>
+  </footer>
+</body>
+</html>

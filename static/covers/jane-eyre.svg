@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="300" height="450" viewBox="0 0 300 450">
+  <rect width="300" height="450" fill="#22333b"/>
+  <rect x="14" y="14" width="272" height="422" fill="none" stroke="#eae0d5" stroke-opacity="0.35" stroke-width="2"/>
+  <text x="150" y="150" font-family="Georgia, serif" font-size="28" font-weight="bold"
+        fill="#eae0d5" text-anchor="middle" letter-spacing="1"><tspan x="150" dy="0">JANE EYRE</tspan></text>
+  <line x1="90" y1="290" x2="210" y2="290" stroke="#eae0d5" stroke-opacity="0.5" stroke-width="1.5"/>
+  <text x="150" y="325" font-family="Georgia, serif" font-size="16" fill="#eae0d5"
+        fill-opacity="0.85" text-anchor="middle">Charlotte Bronte</text>
+  <text x="150" y="410" font-family="Georgia, serif" font-size="12" fill="#eae0d5"
+        fill-opacity="0.6" text-anchor="middle" letter-spacing="3">MARGINALIA</text>
+</svg>

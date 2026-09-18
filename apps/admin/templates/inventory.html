@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Stock</h1>
+<nav class="admin-nav">
+  <a href="/admin">Overview</a><a href="/admin/books">Catalogue</a>
+  <a href="/admin/orders">Orders</a><a href="/admin/inventory">Stock</a>
+  <a href="/admin/outbox">Outbox</a><a href="/admin/jobs">Jobs</a>
+  <a href="/admin/audit">Audit</a><a href="/">Storefront</a>
+</nav>
+<table class="lines">
+  <tr><th>Title</th><th>Format</th><th>On hand</th><th>Threshold</th></tr>
+  {% for row in stock %}
+  <tr class="{% if row.on_hand <= row.reorder_threshold %}low{% endif %}">
+      <td>{{ row.title }}</td><td>{{ row.format }}</td>
+      <td>{{ row.on_hand }}</td><td>{{ row.reorder_threshold }}</td></tr>
+  {% endfor %}
+</table>
+{% endblock %}

@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Sign in</h1>
+<form method="post" action="/login" class="signin">
+  <label>Email <input type="email" name="email" required></label>
+  <label>Password <input type="password" name="password" value="demo" required></label>
+  <button type="submit">Sign in</button>
+</form>
+<h2>Demo accounts</h2>
+<p class="muted">Every account uses the password <code>demo</code>.</p>
+<table class="lines">
+  <tr><th>Email</th><th>Name</th><th>Country</th><th>Customer since</th></tr>
+  {% for a in accounts %}
+  <tr><td><code>{{ a.email }}</code></td><td>{{ a.name }}</td>
+      <td>{{ a.country_code }}</td><td>{{ a.created_at.date() }}</td></tr>
+  {% endfor %}
+</table>
+{% endblock %}

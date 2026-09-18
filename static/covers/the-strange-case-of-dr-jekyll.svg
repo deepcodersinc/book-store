@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="300" height="450" viewBox="0 0 300 450">
+  <rect width="300" height="450" fill="#5c3a21"/>
+  <rect x="14" y="14" width="272" height="422" fill="none" stroke="#f0e2d0" stroke-opacity="0.35" stroke-width="2"/>
+  <text x="150" y="102" font-family="Georgia, serif" font-size="28" font-weight="bold"
+        fill="#f0e2d0" text-anchor="middle" letter-spacing="1"><tspan x="150" dy="0">THE STRANGE</tspan><tspan x="150" dy="34">CASE OF DR</tspan><tspan x="150" dy="34">JEKYLL AND MR</tspan><tspan x="150" dy="34">HYDE</tspan></text>
+  <line x1="90" y1="290" x2="210" y2="290" stroke="#f0e2d0" stroke-opacity="0.5" stroke-width="1.5"/>
+  <text x="150" y="325" font-family="Georgia, serif" font-size="16" fill="#f0e2d0"
+        fill-opacity="0.85" text-anchor="middle">Robert Louis Stevenson</text>
+  <text x="150" y="410" font-family="Georgia, serif" font-size="12" fill="#f0e2d0"
+        fill-opacity="0.6" text-anchor="middle" letter-spacing="3">MARGINALIA</text>
+</svg>

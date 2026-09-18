@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Order {{ order.order_number }}</h1>
+<p class="status-line">Status <strong>{{ order.status }}</strong> &middot;
+  {{ order.total_cents | money }} &middot; {{ order.country_code }} &middot;
+  {{ order.pricing_scheme }} pricing &middot; checkout {{ order.checkout_version }}</p>
+<table class="lines">
+  <tr><th>Title</th><th>Format</th><th>Qty</th><th>Fulfilment</th></tr>
+  {% for item in items %}
+  <tr><td>{{ item.title }}</td><td>{{ item.format }}</td>
+      <td>{{ item.quantity }}</td><td>{{ item.fulfillment_status }}</td></tr>
+  {% endfor %}
+</table>
+{% if downloads %}
+<h2>Downloads</h2>
+<ul>{% for d in downloads %}<li><a href="/download/{{ d.token }}">{{ d.title }}</a>
+  <span class="muted">expires {{ d.expires_at }}</span></li>{% endfor %}</ul>
+{% endif %}
+{% if shipments %}
+<h2>Shipping</h2>
+<ul>{% for s in shipments %}<li>{{ s.carrier }} &middot; {{ s.tracking_number }} ({{ s.status }})</li>{% endfor %}</ul>
+{% endif %}
+{% if order.status == 'pending' %}
+<p class="muted">Payment has not settled yet. Staff can confirm it from the
+  <a href="/admin/orders/{{ order.order_number }}">admin view</a>.</p>
+{% endif %}
+{% endblock %}

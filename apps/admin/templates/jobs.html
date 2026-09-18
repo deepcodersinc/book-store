@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Job queue</h1>
+<nav class="admin-nav">
+  <a href="/admin">Overview</a><a href="/admin/books">Catalogue</a>
+  <a href="/admin/orders">Orders</a><a href="/admin/inventory">Stock</a>
+  <a href="/admin/outbox">Outbox</a><a href="/admin/jobs">Jobs</a>
+  <a href="/admin/audit">Audit</a><a href="/">Storefront</a>
+</nav>
+<p class="muted">Drain with <code>python -m tools.cli fulfil</code>.</p>
+<table class="lines">
+  <tr><th>#</th><th>Type</th><th>Status</th><th>Attempts</th><th>Payload</th><th>Error</th></tr>
+  {% for j in jobs %}
+  <tr><td>{{ j.id }}</td><td>{{ j.type }}</td><td>{{ j.status }}</td>
+      <td>{{ j.attempts }}</td><td class="muted">{{ j.payload }}</td>
+      <td class="muted">{{ j.last_error or '' }}</td></tr>
+  {% endfor %}
+</table>
+{% endblock %}

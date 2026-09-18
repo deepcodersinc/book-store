@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Catalogue</h1>
+<nav class="admin-nav">
+  <a href="/admin">Overview</a><a href="/admin/books">Catalogue</a>
+  <a href="/admin/orders">Orders</a><a href="/admin/inventory">Stock</a>
+  <a href="/admin/outbox">Outbox</a><a href="/admin/jobs">Jobs</a>
+  <a href="/admin/audit">Audit</a><a href="/">Storefront</a>
+</nav>
+<table class="lines">
+  <tr><th>Title</th><th>Author</th><th>Editions</th><th></th></tr>
+  {% for book in books %}
+  <tr><td>{{ book.title }}</td><td>{{ book.author }}</td>
+      <td>{{ book.editions | length }}</td>
+      <td><a href="/admin/books/{{ book.slug }}">Edit</a></td></tr>
+  {% endfor %}
+</table>
+{% endblock %}

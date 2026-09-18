@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Your basket</h1>
+{% if cart.is_empty %}
+  <p class="muted">Nothing here yet. <a href="/books">Browse the shelves</a>.</p>
+{% else %}
+<table class="lines">
+  <tr><th>Title</th><th>Format</th><th>Qty</th><th>Price</th><th></th></tr>
+  {% for line in cart.lines %}
+  <tr>
+    <td><a href="/books/{{ line.slug }}">{{ line.title }}</a><br><span class="muted">{{ line.author }}</span></td>
+    <td>{{ line.format.value | capitalize }}</td>
+    <td>{{ line.quantity }}</td>
+    <td>{{ line.line_total_cents | money }}</td>
+    <td>
+      <form method="post" action="/cart/remove">
+        <input type="hidden" name="edition_id" value="{{ line.edition_id }}">
+        <button class="link">Remove</button>
+      </form>
+    </td>
+  </tr>
+  {% endfor %}
+</table>
+{% if quote %}
+<div class="totals">
+  <div><span>Subtotal</span><span>{{ quote.subtotal_cents | money }}</span></div>
+  {% if quote.discount_cents %}<div class="discount"><span>Discount</span><span>-{{ quote.discount_cents | money }}</span></div>{% endif %}
+  {% if quote.tax_cents %}<div><span>{{ quote.tax_label }}</span><span>{{ quote.tax_cents | money }}</span></div>{% endif %}
+  <div class="grand"><span>Total</span><span>{{ quote.total_cents | money }}</span></div>
+  {% for note in quote.notes %}<p class="note">{{ note }}</p>{% endfor %}
+</div>
+{% endif %}
+<a class="button" href="/checkout">Checkout</a>
+{% endif %}
+{% endblock %}

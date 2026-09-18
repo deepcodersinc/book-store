@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>{{ order.order_number }}</h1>
+<nav class="admin-nav">
+  <a href="/admin">Overview</a><a href="/admin/books">Catalogue</a>
+  <a href="/admin/orders">Orders</a><a href="/admin/inventory">Stock</a>
+  <a href="/admin/outbox">Outbox</a><a href="/admin/jobs">Jobs</a>
+  <a href="/admin/audit">Audit</a><a href="/">Storefront</a>
+</nav>
+<p class="status-line">{{ order.email }} &middot; <strong>{{ order.status }}</strong> &middot;
+  {{ order.total_cents | money }} &middot; {{ order.country_code }} &middot;
+  {{ order.pricing_scheme }} pricing &middot; checkout {{ order.checkout_version }}</p>
+<table class="lines">
+  <tr><th>Title</th><th>Format</th><th>Qty</th><th>Fulfilment</th><th></th></tr>
+  {% for item in items %}
+  <tr><td>{{ item.title }}</td><td>{{ item.format }}</td><td>{{ item.quantity }}</td>
+      <td>{{ item.fulfillment_status }}</td>
+      <td>
+        <form method="post" action="/admin/orders/{{ order.order_number }}/refund">
+          <input type="hidden" name="order_item_id" value="{{ item.id }}">
+          <input type="hidden" name="reason" value="staff refund">
+          <button class="link">Refund</button>
+        </form>
+      </td></tr>
+  {% endfor %}
+</table>
+{% if order.status == 'pending' %}
+<form method="post" action="/admin/orders/{{ order.order_number }}/confirm-payment">
+  <button>Confirm payment</button>
+</form>
+<p class="muted">Replays the webhook Stripe would post once the charge settles.</p>
+{% endif %}
+{% if shipments %}<h2>Shipments</h2>
+<ul>{% for s in shipments %}<li>{{ s.carrier }} &middot; {{ s.tracking_number }}</li>{% endfor %}</ul>{% endif %}
+{% if downloads %}<h2>Download grants</h2>
+<ul>{% for d in downloads %}<li>{{ d.title }} &middot; {{ d.download_count }}/{{ d.max_downloads }} used</li>{% endfor %}</ul>{% endif %}
+{% endblock %}
