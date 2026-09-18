@@ -18,6 +18,7 @@ from services.inventory import service as inventory
 from services.notifications import service as notifications
 from services.orders import service as orders
 from services.payments import service as payments
+from workers.fulfillment import worker
 
 router = APIRouter(prefix="/admin")
 templates = templating.build(Path(__file__).parent / "templates")
@@ -118,6 +119,16 @@ async def outbox(request: Request):
 @router.get("/jobs", response_class=HTMLResponse)
 async def jobs(request: Request):
     return _page(request, "jobs.html", jobs=fulfillment.recent(limit=100))
+
+
+@router.post("/jobs/run")
+async def run_jobs(request: Request):
+    """Drain the queue from the console, the same work the worker does on a timer."""
+    values = await form_data(request)
+    worker.drain()
+    audit.record(STAFF_ACTOR, "queue.drained", "jobs", "-")
+    back = values.get("return_to") or "/admin/jobs"
+    return RedirectResponse(back, status_code=303)
 
 
 @router.get("/inventory", response_class=HTMLResponse)

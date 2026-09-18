@@ -7,7 +7,11 @@
   <a href="/admin/outbox">Outbox</a><a href="/admin/jobs">Jobs</a>
   <a href="/admin/audit">Audit</a><a href="/">Storefront</a>
 </nav>
-<p class="muted">Drain with <code>python -m tools.cli fulfil</code>.</p>
+<form method="post" action="/admin/jobs/run" class="inline-form">
+  <button>Run fulfilment now</button>
+</form>
+<p class="muted">Does the same work as the worker container, or
+  <code>python -m tools.cli fulfil</code>.</p>
 <table class="lines">
   <tr><th>#</th><th>Type</th><th>Status</th><th>Attempts</th><th>Payload</th><th>Error</th></tr>
   {% for j in jobs %}

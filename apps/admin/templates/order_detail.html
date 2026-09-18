@@ -30,6 +30,14 @@
 </form>
 <p class="muted">Replays the webhook Stripe would post once the charge settles.</p>
 {% endif %}
+{% if order.status == 'paid' %}
+<form method="post" action="/admin/jobs/run">
+  <input type="hidden" name="return_to" value="/admin/orders/{{ order.order_number }}">
+  <button>Run fulfilment now</button>
+</form>
+<p class="muted">Payment has settled and the order is queued. Running fulfilment
+  ships physical copies and issues download links.</p>
+{% endif %}
 {% if shipments %}<h2>Shipments</h2>
 <ul>{% for s in shipments %}<li>{{ s.carrier }} &middot; {{ s.tracking_number }}</li>{% endfor %}</ul>{% endif %}
 {% if downloads %}<h2>Download grants</h2>

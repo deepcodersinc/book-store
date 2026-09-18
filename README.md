@@ -1,4 +1,4 @@
-# Marginalia Books
+# LocalBooks
 
 A second-hand bookshop that sells physical and digital editions. Browse the
 catalogue, add to a basket, check out as a guest or as an account holder, and

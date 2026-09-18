@@ -15,7 +15,7 @@ from apps.api.routes import router as api_router
 from apps.storefront.routes import router as storefront_router
 from data import db
 
-app = FastAPI(title="Marginalia Books", version="1.4.0")
+app = FastAPI(title="LocalBooks", version="1.4.0")
 
 app.mount("/static", StaticFiles(directory=str(settings.STATIC_DIR)), name="static")
 
