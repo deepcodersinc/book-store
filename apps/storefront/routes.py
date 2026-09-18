@@ -33,9 +33,9 @@ def _viewer(request: Request):
 
 def _page(request: Request, template: str, **context) -> HTMLResponse:
     customer, cart = _viewer(request)
-    base = {"request": request, "customer": customer, "cart": cart, "query": None}
+    base = {"customer": customer, "cart": cart, "query": None}
     base.update(context)
-    return templates.TemplateResponse(template, base)
+    return templates.TemplateResponse(request, template, base)
 
 
 # ── Browsing ────────────────────────────────────────────────────────────────

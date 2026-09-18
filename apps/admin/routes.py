@@ -26,9 +26,9 @@ STAFF_ACTOR = "staff@bookstore.example"
 
 
 def _page(request: Request, template: str, **context) -> HTMLResponse:
-    base = {"request": request, "customer": None, "cart": None, "query": None}
+    base = {"customer": None, "cart": None, "query": None}
     base.update(context)
-    return templates.TemplateResponse(template, base)
+    return templates.TemplateResponse(request, template, base)
 
 
 @router.get("", response_class=HTMLResponse)
