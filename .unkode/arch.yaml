@@ -1,0 +1,146 @@
+_meta:
+  last_sync_commit: 6596c38ce74a87a7666eb9e9384811a7814a479c
+  last_sync: "2026-09-18T21:54:48Z"
+  version: 1
+
+architecture:
+  - name: Customer Storefront
+    path: apps/storefront
+    kind: frontend
+    tech: [Python, FastAPI, Jinja2]
+    role: Server-rendered shop where customers browse books, manage a cart, check out and view their orders.
+    depends_on: [Business Services, Shared Web Toolkit]
+
+  - name: Staff Console
+    path: apps/admin
+    kind: frontend
+    tech: [Python, FastAPI, Jinja2]
+    role: Back-office pages for staff to manage books, inventory, orders, fulfilment jobs, the email outbox and the audit log.
+    depends_on: [Business Services, Shared Web Toolkit, Fulfilment Worker]
+
+  - name: Public API
+    path: apps/api
+    kind: backend
+    tech: [Python, FastAPI]
+    role: JSON endpoints for the catalogue, ebook downloads and the Stripe payment webhook.
+    depends_on: [Business Services, Third-Party Integrations]
+
+  - name: Business Services
+    path: services
+    kind: backend
+    tech: [Python]
+    role: Domain logic for the bookshop, sitting between the web layer and the data repositories.
+    depends_on: [Data Access Layer, Third-Party Integrations, Domain Schemas]
+    components:
+      - name: Catalog
+        path: services/catalog
+        description: Looks up books and their physical and digital editions.
+      - name: Checkout & Pricing
+        path: services/checkout
+        description: Manages guest and signed-in carts, prices them and turns them into paid orders.
+      - name: Orders
+        path: services/orders
+        description: Creates orders and moves them through their lifecycle.
+      - name: Payments
+        path: services/payments
+        description: Charges customers through Stripe and reconciles webhook events with orders.
+      - name: Fulfilment Jobs
+        path: services/fulfillment
+        description: Queues fulfilment work and manages download grants for ebooks.
+      - name: Inventory
+        path: services/inventory
+        description: Tracks stock levels for physical editions.
+      - name: Customer Identity
+        path: services/identity
+        description: Registers and authenticates customers and manages sessions.
+      - name: Notifications
+        path: services/notifications
+        description: Records and sends transactional emails to customers.
+      - name: Audit Trail
+        path: services/audit
+        description: Records staff actions for the audit log.
+
+  - name: Data Access Layer
+    path: data
+    kind: library
+    tech: [Python, SQLite]
+    role: Owns the database schema and connection, and exposes one repository per domain area.
+    depends_on: [Bookstore Database]
+
+  - name: Third-Party Integrations
+    path: integrations
+    kind: library
+    tech: [Python]
+    role: Clients for payments, email and object storage that fall back to local mocks when no credentials are set.
+    depends_on: [Stripe, SendGrid, Object Storage]
+
+  - name: Shared Web Toolkit
+    path: packages/web
+    kind: library
+    tech: [Python, Jinja2]
+    role: Shared templating setup, base layout and form helpers used by the storefront and staff console.
+
+  - name: Domain Schemas
+    path: packages/schemas
+    kind: library
+    tech: [Python, Pydantic]
+    role: Shared data models for books, carts, customers, orders, payments and fulfilment.
+
+  - name: Fulfilment Worker
+    path: workers/fulfillment
+    kind: worker
+    tech: [Python]
+    role: Drains the job queue, granting ebook downloads or shipping physical copies and reconciling inventory.
+    depends_on: [Business Services, Data Access Layer, Domain Schemas]
+
+  - name: Operations CLI
+    path: tools/cli
+    kind: cli
+    tech: [Python]
+    role: Command-line tool for seeding the database and running fulfilment from the terminal.
+    depends_on: [Business Services, Data Access Layer, Fulfilment Worker]
+
+  - name: Bookstore Database
+    type: external
+    kind: database
+    role: Stores the catalogue, carts, orders, payments, inventory and the job queue in a single SQLite database file.
+
+  - name: Stripe
+    type: external
+    kind: api
+    role: Payment gateway for card charges and payment webhooks.
+
+  - name: SendGrid
+    type: external
+    kind: api
+    role: Delivers transactional customer emails.
+
+  - name: Object Storage
+    type: external
+    kind: storage
+    role: S3-compatible bucket for cover images and ebook files, with the local filesystem as the fallback.
+
+deployment:
+  - name: Web App Container
+    tech: [Docker Compose, uvicorn]
+    role: Serves the storefront, staff console and public API as one ASGI app on port 8000.
+    hosts: [Customer Storefront, Staff Console, Public API]
+    depends_on: [PostgreSQL, Redis, MinIO]
+
+  - name: Fulfilment Worker Container
+    tech: [Docker Compose]
+    role: Runs the fulfilment loop through the operations CLI.
+    hosts: [Fulfilment Worker, Operations CLI]
+    depends_on: [PostgreSQL]
+
+  - name: PostgreSQL
+    tech: [Docker Compose, postgres:16]
+    role: Database server declared in the compose topology.
+
+  - name: Redis
+    tech: [Docker Compose, redis:7]
+    role: Cache server declared in the compose topology.
+
+  - name: MinIO
+    tech: [Docker Compose, minio]
+    role: S3-compatible object store for covers and ebook files.

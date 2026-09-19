@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Architecture — unkode</title>
+<link rel="stylesheet" href="https://esm.sh/reactflow@11.11.4/dist/style.css" />
+<style>
+  :root { color-scheme: light dark; }
+  * { box-sizing: border-box; }
+  html, body, #root { height: 100%; margin: 0; }
+  body {
+    font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    background: #f8fafc;
+    color: #0f172a;
+  }
+  #root { display: flex; }
+  .flow-wrap { flex: 1 1 auto; position: relative; }
+  header {
+    position: absolute; top: 0; left: 0; right: 0; z-index: 5;
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 16px;
+    background: rgba(248,250,252,0.9);
+    border-bottom: 1px solid #e2e8f0;
+    backdrop-filter: blur(6px);
+  }
+  header h1 { font-size: 14px; font-weight: 650; margin: 0; letter-spacing: .2px; }
+  header .legend { display: flex; gap: 14px; margin-left: auto; font-size: 12px; color: #475569; }
+  header .legend span { display: inline-flex; align-items: center; gap: 5px; }
+  header .dot { width: 10px; height: 10px; border-radius: 3px; display: inline-block; border: 1.5px solid; }
+
+  .node {
+    padding: 9px 13px; border-radius: 9px; border: 1.5px solid;
+    background: #ffffff; min-width: 120px; max-width: 230px;
+    box-shadow: 0 1px 2px rgba(15,23,42,0.06);
+    cursor: pointer; transition: box-shadow .12s, transform .12s;
+  }
+  .node:hover { box-shadow: 0 4px 14px rgba(15,23,42,0.14); transform: translateY(-1px); }
+  .node.selected { box-shadow: 0 0 0 3px rgba(59,130,246,0.35); }
+  .node .title { font-size: 13px; font-weight: 620; line-height: 1.25; }
+  .node .kind { font-size: 10px; text-transform: uppercase; letter-spacing: .6px; opacity: .65; margin-top: 2px; }
+  .node .tech { font-size: 11px; opacity: .7; margin-top: 4px; }
+  .node.external { border-style: dashed; background: #f1f5f9; }
+
+  /* diff status */
+  .node.added    { background: #d1fae5; border-color: #059669; color: #064e3b; }
+  .node.removed  { background: #fee2e2; border-color: #dc2626; color: #7f1d1d; border-style: dashed; }
+  .node.modified { background: #fef3c7; border-color: #d97706; color: #78350f; }
+
+  aside {
+    width: 340px; flex: 0 0 340px; border-left: 1px solid #e2e8f0;
+    background: #ffffff; padding: 20px; overflow-y: auto;
+  }
+  aside.empty { color: #94a3b8; font-size: 13px; display: flex; align-items: center; justify-content: center; text-align: center; }
+  aside h2 { font-size: 17px; margin: 0 0 2px; }
+  aside .k { font-size: 11px; text-transform: uppercase; letter-spacing: .6px; color: #64748b; margin-bottom: 14px; }
+  aside .row { margin-bottom: 14px; }
+  aside .row .label { font-size: 11px; text-transform: uppercase; letter-spacing: .5px; color: #94a3b8; margin-bottom: 4px; }
+  aside .row .val { font-size: 13px; line-height: 1.5; }
+  aside code { background: #f1f5f9; padding: 1px 6px; border-radius: 4px; font-size: 12px; }
+  aside .chip { display: inline-block; background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe;
+                padding: 2px 9px; border-radius: 999px; font-size: 12px; margin: 0 5px 5px 0; }
+  aside .comp { border: 1px solid #e2e8f0; border-radius: 8px; padding: 9px 11px; margin-bottom: 8px; }
+  aside .comp .cn { font-size: 13px; font-weight: 600; }
+  aside .comp .cd { font-size: 12px; color: #475569; margin-top: 2px; line-height: 1.45; }
+
+  @media (prefers-color-scheme: dark) {
+    body { background: #0b1120; color: #e2e8f0; }
+    header { background: rgba(11,17,32,0.9); border-color: #1e293b; }
+    header .legend { color: #94a3b8; }
+    .node { background: #1e293b; box-shadow: 0 1px 2px rgba(0,0,0,0.4); }
+    .node.external { background: #172033; }
+    aside { background: #0f172a; border-color: #1e293b; }
+    aside code { background: #1e293b; }
+    aside .chip { background: #172033; color: #93c5fd; border-color: #1e3a5f; }
+    aside .comp { border-color: #1e293b; }
+    aside .comp .cd { color: #94a3b8; }
+  }
+</style>
+<script type="importmap">
+{
+  "imports": {
+    "react": "https://esm.sh/react@18.3.1",
+    "react-dom": "https://esm.sh/react-dom@18.3.1",
+    "react-dom/client": "https://esm.sh/react-dom@18.3.1/client",
+    "reactflow": "https://esm.sh/reactflow@11.11.4?deps=react@18.3.1,react-dom@18.3.1",
+    "@dagrejs/dagre": "https://esm.sh/@dagrejs/dagre@1.1.4",
+    "htm": "https://esm.sh/htm@3.1.1"
+  }
+}
+</script>
+</head>
+<body>
+<div id="root"></div>
+<script type="module">
+import React, { useState, useMemo, useCallback } from "react";
+import { createRoot } from "react-dom/client";
+import ReactFlow, { Background, Controls, MiniMap, Handle, Position, ReactFlowProvider } from "reactflow";
+import dagre from "@dagrejs/dagre";
+import htm from "htm";
+
+const html = htm.bind(React.createElement);
+
+const DATA = {"title": "Architecture — unkode", "nodes": [{"id": "Customer_Storefront", "name": "Customer Storefront", "kind": "frontend", "isExternal": false, "tech": ["Python", "FastAPI", "Jinja2"], "role": "Server-rendered shop where customers browse books, manage a cart, check out and view their orders.", "path": "apps/storefront", "dependsOn": ["Business Services", "Shared Web Toolkit"], "components": [], "status": null}, {"id": "Staff_Console", "name": "Staff Console", "kind": "frontend", "isExternal": false, "tech": ["Python", "FastAPI", "Jinja2"], "role": "Back-office pages for staff to manage books, inventory, orders, fulfilment jobs, the email outbox and the audit log.", "path": "apps/admin", "dependsOn": ["Business Services", "Shared Web Toolkit", "Fulfilment Worker"], "components": [], "status": null}, {"id": "Public_API", "name": "Public API", "kind": "backend", "isExternal": false, "tech": ["Python", "FastAPI"], "role": "JSON endpoints for the catalogue, ebook downloads and the Stripe payment webhook.", "path": "apps/api", "dependsOn": ["Business Services", "Third-Party Integrations"], "components": [], "status": null}, {"id": "Business_Services", "name": "Business Services", "kind": "backend", "isExternal": false, "tech": ["Python"], "role": "Domain logic for the bookshop, sitting between the web layer and the data repositories.", "path": "services", "dependsOn": ["Data Access Layer", "Third-Party Integrations", "Domain Schemas"], "components": [{"name": "Catalog", "description": "Looks up books and their physical and digital editions."}, {"name": "Checkout & Pricing", "description": "Manages guest and signed-in carts, prices them and turns them into paid orders."}, {"name": "Orders", "description": "Creates orders and moves them through their lifecycle."}, {"name": "Payments", "description": "Charges customers through Stripe and reconciles webhook events with orders."}, {"name": "Fulfilment Jobs", "description": "Queues fulfilment work and manages download grants for ebooks."}, {"name": "Inventory", "description": "Tracks stock levels for physical editions."}, {"name": "Customer Identity", "description": "Registers and authenticates customers and manages sessions."}, {"name": "Notifications", "description": "Records and sends transactional emails to customers."}, {"name": "Audit Trail", "description": "Records staff actions for the audit log."}], "status": null}, {"id": "Data_Access_Layer", "name": "Data Access Layer", "kind": "library", "isExternal": false, "tech": ["Python", "SQLite"], "role": "Owns the database schema and connection, and exposes one repository per domain area.", "path": "data", "dependsOn": ["Bookstore Database"], "components": [], "status": null}, {"id": "Third_Party_Integrations", "name": "Third-Party Integrations", "kind": "library", "isExternal": false, "tech": ["Python"], "role": "Clients for payments, email and object storage that fall back to local mocks when no credentials are set.", "path": "integrations", "dependsOn": ["Stripe", "SendGrid", "Object Storage"], "components": [], "status": null}, {"id": "Shared_Web_Toolkit", "name": "Shared Web Toolkit", "kind": "library", "isExternal": false, "tech": ["Python", "Jinja2"], "role": "Shared templating setup, base layout and form helpers used by the storefront and staff console.", "path": "packages/web", "dependsOn": [], "components": [], "status": null}, {"id": "Domain_Schemas", "name": "Domain Schemas", "kind": "library", "isExternal": false, "tech": ["Python", "Pydantic"], "role": "Shared data models for books, carts, customers, orders, payments and fulfilment.", "path": "packages/schemas", "dependsOn": [], "components": [], "status": null}, {"id": "Fulfilment_Worker", "name": "Fulfilment Worker", "kind": "worker", "isExternal": false, "tech": ["Python"], "role": "Drains the job queue, granting ebook downloads or shipping physical copies and reconciling inventory.", "path": "workers/fulfillment", "dependsOn": ["Business Services", "Data Access Layer", "Domain Schemas"], "components": [], "status": null}, {"id": "Operations_CLI", "name": "Operations CLI", "kind": "cli", "isExternal": false, "tech": ["Python"], "role": "Command-line tool for seeding the database and running fulfilment from the terminal.", "path": "tools/cli", "dependsOn": ["Business Services", "Data Access Layer", "Fulfilment Worker"], "components": [], "status": null}, {"id": "Bookstore_Database", "name": "Bookstore Database", "kind": "database", "isExternal": true, "tech": [], "role": "Stores the catalogue, carts, orders, payments, inventory and the job queue in a single SQLite database file.", "path": "", "dependsOn": [], "components": [], "status": null}, {"id": "Stripe", "name": "Stripe", "kind": "api", "isExternal": true, "tech": [], "role": "Payment gateway for card charges and payment webhooks.", "path": "", "dependsOn": [], "components": [], "status": null}, {"id": "SendGrid", "name": "SendGrid", "kind": "api", "isExternal": true, "tech": [], "role": "Delivers transactional customer emails.", "path": "", "dependsOn": [], "components": [], "status": null}, {"id": "Object_Storage", "name": "Object Storage", "kind": "storage", "isExternal": true, "tech": [], "role": "S3-compatible bucket for cover images and ebook files, with the local filesystem as the fallback.", "path": "", "dependsOn": [], "components": [], "status": null}], "edges": [{"id": "Customer_Storefront__Business_Services", "source": "Customer_Storefront", "target": "Business_Services"}, {"id": "Customer_Storefront__Shared_Web_Toolkit", "source": "Customer_Storefront", "target": "Shared_Web_Toolkit"}, {"id": "Staff_Console__Business_Services", "source": "Staff_Console", "target": "Business_Services"}, {"id": "Staff_Console__Shared_Web_Toolkit", "source": "Staff_Console", "target": "Shared_Web_Toolkit"}, {"id": "Staff_Console__Fulfilment_Worker", "source": "Staff_Console", "target": "Fulfilment_Worker"}, {"id": "Public_API__Business_Services", "source": "Public_API", "target": "Business_Services"}, {"id": "Public_API__Third_Party_Integrations", "source": "Public_API", "target": "Third_Party_Integrations"}, {"id": "Business_Services__Data_Access_Layer", "source": "Business_Services", "target": "Data_Access_Layer"}, {"id": "Business_Services__Third_Party_Integrations", "source": "Business_Services", "target": "Third_Party_Integrations"}, {"id": "Business_Services__Domain_Schemas", "source": "Business_Services", "target": "Domain_Schemas"}, {"id": "Data_Access_Layer__Bookstore_Database", "source": "Data_Access_Layer", "target": "Bookstore_Database"}, {"id": "Third_Party_Integrations__Stripe", "source": "Third_Party_Integrations", "target": "Stripe"}, {"id": "Third_Party_Integrations__SendGrid", "source": "Third_Party_Integrations", "target": "SendGrid"}, {"id": "Third_Party_Integrations__Object_Storage", "source": "Third_Party_Integrations", "target": "Object_Storage"}, {"id": "Fulfilment_Worker__Business_Services", "source": "Fulfilment_Worker", "target": "Business_Services"}, {"id": "Fulfilment_Worker__Data_Access_Layer", "source": "Fulfilment_Worker", "target": "Data_Access_Layer"}, {"id": "Fulfilment_Worker__Domain_Schemas", "source": "Fulfilment_Worker", "target": "Domain_Schemas"}, {"id": "Operations_CLI__Business_Services", "source": "Operations_CLI", "target": "Business_Services"}, {"id": "Operations_CLI__Data_Access_Layer", "source": "Operations_CLI", "target": "Data_Access_Layer"}, {"id": "Operations_CLI__Fulfilment_Worker", "source": "Operations_CLI", "target": "Fulfilment_Worker"}]};
+const DIRECTION = "LR"; // "LR" or "TB"
+
+// kind → accent color for the plain (non-diff) view
+const KIND_COLOR = {
+  frontend: "#8b5cf6", backend: "#3b82f6", worker: "#f59e0b",
+  library: "#10b981", cli: "#64748b", other: "#94a3b8",
+  database: "#0ea5e9", cache: "#ef4444", queue: "#f97316",
+  api: "#ec4899", storage: "#14b8a6",
+};
+
+const NODE_W = 190, NODE_H = 62;
+
+function layout(nodes, edges, direction) {
+  const g = new dagre.graphlib.Graph();
+  g.setDefaultEdgeLabel(() => ({}));
+  g.setGraph({ rankdir: direction, nodesep: 45, ranksep: 80, marginx: 30, marginy: 30 });
+  nodes.forEach((n) => g.setNode(n.id, { width: NODE_W, height: NODE_H }));
+  edges.forEach((e) => g.setEdge(e.source, e.target));
+  dagre.layout(g);
+  return nodes.map((n) => {
+    const p = g.node(n.id);
+    return { ...n, position: { x: p.x - NODE_W / 2, y: p.y - NODE_H / 2 } };
+  });
+}
+
+function ArchNode({ data, selected }) {
+  const accent = KIND_COLOR[data.kind] || KIND_COLOR.other;
+  const cls = ["node"];
+  if (data.isExternal) cls.push("external");
+  if (data.status) cls.push(data.status);
+  if (selected) cls.push("selected");
+  const style = data.status ? {} : { borderColor: accent };
+  return html`
+    <div class=${cls.join(" ")} style=${style}>
+      <${Handle} type="target" position=${DIRECTION === "LR" ? Position.Left : Position.Top} style=${{ opacity: 0 }} />
+      <div class="title">${data.name}</div>
+      <div class="kind">${data.isExternal ? "ext · " : ""}${data.kind}</div>
+      ${data.tech && data.tech.length
+        ? html`<div class="tech">${data.tech.join(", ")}</div>` : null}
+      <${Handle} type="source" position=${DIRECTION === "LR" ? Position.Right : Position.Bottom} style=${{ opacity: 0 }} />
+    </div>`;
+}
+
+function DetailPanel({ node }) {
+  if (!node) {
+    return html`<aside class="empty">Click a module to see its role, dependencies, and components.</aside>`;
+  }
+  const d = node.data;
+  return html`
+    <aside>
+      <h2>${d.name}</h2>
+      <div class="k">${d.isExternal ? "External · " : ""}${d.kind}</div>
+      ${d.role ? html`<div class="row"><div class="label">Role</div><div class="val">${d.role}</div></div>` : null}
+      ${d.path ? html`<div class="row"><div class="label">Path</div><div class="val"><code>${d.path}</code></div></div>` : null}
+      ${d.tech && d.tech.length ? html`
+        <div class="row"><div class="label">Tech</div><div class="val">
+          ${d.tech.map((t) => html`<span class="chip" key=${t}>${t}</span>`)}
+        </div></div>` : null}
+      ${d.dependsOn && d.dependsOn.length ? html`
+        <div class="row"><div class="label">Depends on</div><div class="val">
+          ${d.dependsOn.map((t) => html`<span class="chip" key=${t}>${t}</span>`)}
+        </div></div>` : null}
+      ${d.components && d.components.length ? html`
+        <div class="row"><div class="label">Components</div><div class="val">
+          ${d.components.map((c) => html`
+            <div class="comp" key=${c.name}>
+              <div class="cn">${c.name}</div>
+              ${c.description ? html`<div class="cd">${c.description}</div>` : null}
+            </div>`)}
+        </div></div>` : null}
+    </aside>`;
+}
+
+function App() {
+  const nodeTypes = useMemo(() => ({ arch: ArchNode }), []);
+  const [selectedId, setSelectedId] = useState(null);
+
+  const rfNodes = useMemo(() => {
+    const laid = layout(DATA.nodes, DATA.edges, DIRECTION);
+    return laid.map((n) => ({
+      id: n.id, type: "arch", position: n.position, data: n,
+    }));
+  }, []);
+
+  const rfEdges = useMemo(() =>
+    DATA.edges.map((e) => ({
+      ...e, animated: false,
+      markerEnd: { type: "arrowclosed" },
+      style: { stroke: "#94a3b8", strokeWidth: 1.5 },
+    })), []);
+
+  const selectedNode = rfNodes.find((n) => n.id === selectedId) || null;
+  const onNodeClick = useCallback((_e, node) => setSelectedId(node.id), []);
+  const onPaneClick = useCallback(() => setSelectedId(null), []);
+
+  return html`
+    <div class="flow-wrap">
+      <header>
+        <h1>${DATA.title}</h1>
+        <div class="legend">
+          <span><span class="dot" style=${{ borderColor: KIND_COLOR.frontend }}></span>frontend</span>
+          <span><span class="dot" style=${{ borderColor: KIND_COLOR.backend }}></span>backend</span>
+          <span><span class="dot" style=${{ borderColor: KIND_COLOR.worker }}></span>worker</span>
+          <span><span class="dot" style=${{ borderColor: KIND_COLOR.library }}></span>library</span>
+          <span><span class="dot" style=${{ borderColor: KIND_COLOR.other, borderStyle: "dashed" }}></span>external</span>
+        </div>
+      </header>
+      <${ReactFlowProvider}>
+        <${ReactFlow}
+          nodes=${rfNodes.map((n) => ({ ...n, selected: n.id === selectedId }))}
+          edges=${rfEdges}
+          nodeTypes=${nodeTypes}
+          onNodeClick=${onNodeClick}
+          onPaneClick=${onPaneClick}
+          fitView
+          minZoom=${0.15}
+          proOptions=${{ hideAttribution: true }}
+        >
+          <${Background} gap=${20} size=${1} color="#cbd5e1" />
+          <${Controls} showInteractive=${false} />
+          <${MiniMap} pannable zoomable nodeColor=${(n) => KIND_COLOR[n.data.kind] || KIND_COLOR.other} />
+        <//>
+      <//>
+    </div>
+    <${DetailPanel} node=${selectedNode} />`;
+}
+
+createRoot(document.getElementById("root")).render(html`<${App} />`);
+</script>
+</body>
+</html>
