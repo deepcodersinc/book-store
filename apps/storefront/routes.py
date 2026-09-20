@@ -41,15 +41,19 @@ def _page(request: Request, template: str, **context) -> HTMLResponse:
 # ── Browsing ────────────────────────────────────────────────────────────────
 
 @router.get("/", response_class=HTMLResponse)
-async def home(request: Request):
-    return _page(request, "index.html", books=catalog.browse(limit=12),
-                 cover_url=catalog.cover_url)
+async def home(request: Request, sort: str = catalog.DEFAULT_SORT):
+    sort = catalog.normalise_sort(sort)
+    return _page(request, "index.html", books=catalog.browse(limit=12, sort=sort),
+                 cover_url=catalog.cover_url, sort=sort,
+                 sort_options=catalog.SORT_OPTIONS)
 
 
 @router.get("/books", response_class=HTMLResponse)
-async def book_list(request: Request):
-    return _page(request, "index.html", books=catalog.browse(),
-                 cover_url=catalog.cover_url)
+async def book_list(request: Request, sort: str = catalog.DEFAULT_SORT):
+    sort = catalog.normalise_sort(sort)
+    return _page(request, "index.html", books=catalog.browse(sort=sort),
+                 cover_url=catalog.cover_url, sort=sort,
+                 sort_options=catalog.SORT_OPTIONS)
 
 
 @router.get("/search", response_class=HTMLResponse)
