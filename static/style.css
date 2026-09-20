@@ -53,6 +53,15 @@ h3 { font-size: 15px; margin: 10px 0 2px; }
   display: grid; gap: 28px;
   grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
 }
+.bestsellers { margin-bottom: 8px; }
+.bestsellers h2 { margin-top: 0; }
+.strip {
+  display: grid; gap: 28px;
+  /* auto-fill, not auto-fit, so a short strip keeps card-sized covers
+     instead of stretching two books across the whole width. */
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+}
+.card .sold { margin: 5px 0 0; }
 .card img {
   width: 100%; aspect-ratio: 2/3; object-fit: cover;
   border-radius: 3px; box-shadow: 0 2px 8px rgba(35,32,28,0.16);

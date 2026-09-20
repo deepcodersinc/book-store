@@ -87,6 +87,13 @@ class Book(BaseModel):
         return min(prices) if prices else None
 
 
+class BestSeller(BaseModel):
+    """A book with how many copies of it have sold."""
+
+    book: Book
+    copies_sold: int
+
+
 class CartLine(BaseModel):
     edition_id: int
     quantity: int

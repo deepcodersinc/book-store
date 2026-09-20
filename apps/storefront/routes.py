@@ -43,7 +43,7 @@ def _page(request: Request, template: str, **context) -> HTMLResponse:
 @router.get("/", response_class=HTMLResponse)
 async def home(request: Request):
     return _page(request, "index.html", books=catalog.browse(limit=12),
-                 cover_url=catalog.cover_url)
+                 bestsellers=catalog.bestsellers(), cover_url=catalog.cover_url)
 
 
 @router.get("/books", response_class=HTMLResponse)
