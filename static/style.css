@@ -49,6 +49,23 @@ h3 { font-size: 15px; margin: 10px 0 2px; }
 .hero h1 { font-size: 32px; }
 .hero p { color: var(--muted); margin: 0; }
 
+.sortbar {
+  display: flex; align-items: center; flex-wrap: wrap; gap: 8px;
+  margin-bottom: 20px; font-size: 13px;
+}
+.sortbar > span { color: var(--muted); text-transform: uppercase;
+  letter-spacing: 0.06em; font-size: 12px; margin-right: 4px; }
+.sortbar .pill {
+  padding: 4px 12px; border: 1px solid var(--line); border-radius: 14px;
+  color: var(--muted); background: #fff;
+}
+.sortbar .pill:hover { border-color: var(--accent); color: var(--accent);
+  text-decoration: none; }
+.sortbar .pill.active {
+  background: var(--accent); border-color: var(--accent); color: #fff;
+  font-weight: bold;
+}
+
 .grid {
   display: grid; gap: 28px;
   grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
