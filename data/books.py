@@ -17,6 +17,28 @@ def list_books(search: str | None = None, limit: int = 50) -> list[dict]:
     return db.query("SELECT * FROM books ORDER BY title LIMIT ?", (limit,))
 
 
+def list_bestsellers(limit: int = 5) -> list[dict]:
+    """Books ranked by copies sold, all formats counted together.
+
+    Only orders that were actually paid for count — a basket still pending, or
+    an order later cancelled or refunded, is not a sale.
+    """
+    return db.query(
+        """
+        SELECT b.*, SUM(oi.quantity) AS copies_sold
+        FROM order_items oi
+        JOIN editions e ON e.id = oi.edition_id
+        JOIN books b ON b.id = e.book_id
+        JOIN orders o ON o.id = oi.order_id
+        WHERE o.status IN ('paid', 'fulfilled')
+        GROUP BY b.id
+        ORDER BY copies_sold DESC, lower(b.title)
+        LIMIT ?
+        """,
+        (limit,),
+    )
+
+
 def get_book(book_id: int) -> dict | None:
     return db.query_one("SELECT * FROM books WHERE id = ?", (book_id,))
 

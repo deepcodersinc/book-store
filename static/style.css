@@ -53,6 +53,15 @@ h3 { font-size: 15px; margin: 10px 0 2px; }
   display: grid; gap: 28px;
   grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
 }
+.bestsellers { margin-bottom: 8px; }
+.bestsellers h2 { margin-top: 0; }
+.strip {
+  display: grid; gap: 28px;
+  /* auto-fill, not auto-fit, so a short strip keeps card-sized covers
+     instead of stretching two books across the whole width. */
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+}
+.card .sold { margin: 5px 0 0; }
 .card img {
   width: 100%; aspect-ratio: 2/3; object-fit: cover;
   border-radius: 3px; box-shadow: 0 2px 8px rgba(35,32,28,0.16);
@@ -101,6 +110,12 @@ button.link:hover, .inline button:hover { background: none; text-decoration: und
 
 .checkout { display: grid; grid-template-columns: 1fr 340px; gap: 44px; align-items: start; }
 .signin, .checkout form { display: grid; gap: 14px; max-width: 380px; }
+.mobile-form { display: flex; align-items: end; gap: 10px; margin-bottom: 6px; }
+.mobile-form label { flex: 1; max-width: 260px; }
+input[type=tel] {
+  padding: 8px 10px; border: 1px solid var(--line); border-radius: 4px;
+  font-family: inherit; font-size: 14px; color: var(--ink); background: #fff;
+}
 label { display: grid; gap: 4px; font-size: 13px; color: var(--muted); }
 input[type=text], input[type=email], input[type=password], textarea {
   padding: 8px 10px; border: 1px solid var(--line); border-radius: 4px;

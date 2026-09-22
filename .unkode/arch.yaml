@@ -1,6 +1,6 @@
 _meta:
-  last_sync_commit: 6596c38ce74a87a7666eb9e9384811a7814a479c
-  last_sync: "2026-09-18T21:54:48Z"
+  last_sync_commit: 21019f0f199b585128de65e80eef98db1c1725d8
+  last_sync: "2026-09-22T21:06:47Z"
   version: 1
 
 architecture:
@@ -71,8 +71,8 @@ architecture:
     path: integrations
     kind: library
     tech: [Python]
-    role: Clients for payments, email and object storage that fall back to local mocks when no credentials are set.
-    depends_on: [Stripe, SendGrid, Object Storage]
+    role: Clients for payments, email, text messages and object storage that fall back to local mocks when no credentials are set.
+    depends_on: [Stripe, SendGrid, Twilio, Object Storage]
 
   - name: Shared Web Toolkit
     path: packages/web
@@ -119,6 +119,11 @@ architecture:
     type: external
     kind: storage
     role: S3-compatible bucket for cover images and ebook files, with the local filesystem as the fallback.
+
+  - name: Twilio
+    type: external
+    kind: api
+    role: Sends customers shipping updates by text message.
 
 deployment:
   - name: Web App Container

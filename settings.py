@@ -20,6 +20,8 @@ ASSETS_DIR = ROOT / "assets"
 STRIPE_API_KEY = os.getenv("STRIPE_API_KEY", "")
 STRIPE_WEBHOOK_SECRET = os.getenv("STRIPE_WEBHOOK_SECRET", "")
 SENDGRID_API_KEY = os.getenv("SENDGRID_API_KEY", "")
+TWILIO_AUTH_TOKEN = os.getenv("TWILIO_AUTH_TOKEN", "")
+TWILIO_FROM_NUMBER = os.getenv("TWILIO_FROM_NUMBER", "")
 
 # Object storage for covers and ebook files. Falls back to the local filesystem.
 S3_BUCKET = os.getenv("S3_BUCKET", "")

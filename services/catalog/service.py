@@ -7,7 +7,7 @@ resolution all depend on rules that live in this module.
 
 from data import books as book_repo
 from integrations import storage
-from packages.schemas.models import Book, Edition, EditionFormat
+from packages.schemas.models import BestSeller, Book, Edition, EditionFormat
 
 
 def _to_edition(row: dict) -> Edition:
@@ -40,6 +40,17 @@ def browse(search: str | None = None, limit: int = 50) -> list[Book]:
     """Catalogue listing, with editions attached so prices can be shown."""
     rows = book_repo.list_books(search=search, limit=limit)
     return [_to_book(row, book_repo.editions_for_book(row["id"])) for row in rows]
+
+
+def bestsellers(limit: int = 5) -> list[BestSeller]:
+    """The shop's best-selling books, most copies first.
+
+    Returns fewer than `limit` when fewer books have sold.
+    """
+    return [
+        BestSeller(book=_to_book(row), copies_sold=row["copies_sold"])
+        for row in book_repo.list_bestsellers(limit=limit)
+    ]
 
 
 def get_by_slug(slug: str) -> Book | None:

@@ -4,6 +4,7 @@ Almost every other flow depends on this module to know who is asking.
 """
 
 import hashlib
+import re
 import secrets
 from datetime import datetime, timedelta
 
@@ -13,6 +14,12 @@ from packages.schemas.models import Customer
 
 SESSION_TTL_DAYS = 14
 DEMO_PASSWORD = "demo"
+
+# Deliberately permissive: shoppers write numbers with spaces, dashes and
+# brackets, and this shop sells across borders. Anything that reduces to a
+# plausible run of digits is kept, in the shape the carrier wants it.
+_MOBILE_PUNCTUATION = re.compile(r"[\s().-]")
+_MOBILE_SHAPE = re.compile(r"^\+?\d{7,15}$")
 
 
 def hash_password(password: str) -> str:
@@ -24,14 +31,44 @@ def verify_password(password: str, password_hash: str) -> bool:
     return secrets.compare_digest(hash_password(password), password_hash)
 
 
+class IdentityError(ValueError):
+    pass
+
+
 def _to_customer(row: dict) -> Customer:
     return Customer(
         id=row["id"],
         email=row["email"],
         name=row["name"],
         country_code=row.get("country_code", "US"),
+        mobile_number=row.get("mobile_number") or None,
         created_at=datetime.fromisoformat(row["created_at"]),
     )
+
+
+def normalise_mobile(raw: str) -> str | None:
+    """Tidy a number as typed. None means the customer cleared the field."""
+    cleaned = _MOBILE_PUNCTUATION.sub("", raw or "")
+    if not cleaned:
+        return None
+    if not _MOBILE_SHAPE.match(cleaned):
+        raise IdentityError("That does not look like a mobile number.")
+    return cleaned
+
+
+def set_mobile_number(customer_id: int, raw: str) -> str | None:
+    """Store a mobile number for texts, or clear it when given nothing."""
+    mobile = normalise_mobile(raw)
+    customer_repo.set_mobile_number(customer_id, mobile)
+    return mobile
+
+
+def mobile_for_customer(customer_id: int | None) -> str | None:
+    """The number to text, if this order belongs to an account that has one."""
+    if customer_id is None:
+        return None
+    row = customer_repo.get_customer(customer_id)
+    return (row or {}).get("mobile_number") or None
 
 
 def authenticate(email: str, password: str) -> Customer | None:
