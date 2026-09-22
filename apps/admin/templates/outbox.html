@@ -9,9 +9,10 @@
 </nav>
 <p class="muted">Every message the system produced. Nothing is actually delivered in this environment.</p>
 <table class="lines">
-  <tr><th>Sent</th><th>Type</th><th>To</th><th>Subject</th></tr>
+  <tr><th>Sent</th><th>Channel</th><th>Type</th><th>To</th><th>Subject</th></tr>
   {% for m in messages %}
-  <tr><td class="muted">{{ m.sent_at }}</td><td>{{ m.type }}</td>
+  <tr><td class="muted">{{ m.sent_at }}</td><td><span class="tag">{{ m.channel }}</span></td>
+      <td>{{ m.type }}</td>
       <td>{{ m.recipient }}</td><td>{{ m.subject }}</td></tr>
   {% endfor %}
 </table>

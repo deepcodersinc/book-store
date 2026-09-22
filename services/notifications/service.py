@@ -5,13 +5,22 @@ admin console can show an outbox and nothing is invisible in a demo.
 """
 
 from data import notifications as notification_repo
-from integrations import email_client
+from integrations import email_client, sms_client
+from services.identity import service as identity
 
 
 def _send(type_: str, recipient: str, subject: str, body: str) -> int:
     result = email_client.send(recipient, subject, body)
     status = "sent" if result.get("accepted") else "failed"
     return notification_repo.record(type_, recipient, subject, body, status=status)
+
+
+def _send_text(type_: str, recipient: str, subject: str, body: str) -> int:
+    """Same contract as _send, over SMS. Recorded in the outbox either way."""
+    result = sms_client.send(recipient, body)
+    status = "sent" if result.get("accepted") else "failed"
+    return notification_repo.record(type_, recipient, subject, body,
+                                    channel="sms", status=status)
 
 
 def order_confirmed(order: dict, items: list[dict]) -> int:
@@ -28,12 +37,21 @@ def order_confirmed(order: dict, items: list[dict]) -> int:
 
 
 def shipment_dispatched(order: dict, tracking_number: str) -> int:
+    subject = f"Order {order['order_number']} has shipped"
     body = (
         f"Your order {order['order_number']} is on its way.\n\n"
         f"Tracking number: {tracking_number}"
     )
-    return _send("shipment_dispatched", order["email"],
-                 f"Order {order['order_number']} has shipped", body)
+    notification_id = _send("shipment_dispatched", order["email"], subject, body)
+
+    # A text as well, for accounts that gave us a number. Guest orders, and
+    # accounts without one, simply get the email.
+    mobile = identity.mobile_for_customer(order.get("customer_id"))
+    if mobile:
+        _send_text("shipment_dispatched", mobile, subject,
+                   f"LocalBooks: order {order['order_number']} has shipped. "
+                   f"Tracking {tracking_number}.")
+    return notification_id
 
 
 def download_ready(order: dict, title: str, token: str) -> int:

@@ -188,3 +188,19 @@ async def account(request: Request):
         return RedirectResponse("/login", status_code=303)
     return _page(request, "account.html", orders=orders.history(customer.id),
                  legacy=identity.is_legacy_account(customer))
+
+
+@router.post("/account/mobile")
+async def update_mobile(request: Request):
+    values = await form_data(request)
+    customer, _ = _viewer(request)
+    if not customer:
+        return RedirectResponse("/login", status_code=303)
+
+    try:
+        identity.set_mobile_number(customer.id, values.get("mobile_number", ""))
+    except identity.IdentityError as exc:
+        return _page(request, "account.html", orders=orders.history(customer.id),
+                     legacy=identity.is_legacy_account(customer), error=str(exc))
+
+    return RedirectResponse("/account", status_code=303)

@@ -32,6 +32,7 @@ graph LR
     Stripe[["Stripe"]]
     SendGrid[["SendGrid"]]
     Object_Storage[("Object Storage")]
+    Twilio[["Twilio"]]
 
     Customer_Storefront --> Business_Services
     Customer_Storefront --> Shared_Web_Toolkit
@@ -46,6 +47,7 @@ graph LR
     Data_Access_Layer --> Bookstore_Database
     Third_Party_Integrations --> Stripe
     Third_Party_Integrations --> SendGrid
+    Third_Party_Integrations --> Twilio
     Third_Party_Integrations --> Object_Storage
     Fulfilment_Worker --> Business_Services
     Fulfilment_Worker --> Data_Access_Layer
@@ -113,11 +115,11 @@ Owns the database schema and connection, and exposes one repository per domain a
 
 ### Third-Party Integrations `Python`
 
-Clients for payments, email and object storage that fall back to local mocks when no credentials are set.
+Clients for payments, email, text messages and object storage that fall back to local mocks when no credentials are set.
 
 **Path:** `integrations`
 
-**Depends on:** Stripe, SendGrid, Object Storage
+**Depends on:** Stripe, SendGrid, Twilio, Object Storage
 
 
 ### Shared Web Toolkit `Python, Jinja2`

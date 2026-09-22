@@ -30,6 +30,14 @@ def create_customer(email: str, name: str, password_hash: str,
     )
 
 
+def set_mobile_number(customer_id: int, mobile_number: str | None) -> None:
+    """Store a mobile number, or None to remove the one on file."""
+    db.execute(
+        "UPDATE customers SET mobile_number = ? WHERE id = ?",
+        (mobile_number, customer_id),
+    )
+
+
 def list_customers() -> list[dict]:
     return db.query("SELECT * FROM customers ORDER BY created_at")
 

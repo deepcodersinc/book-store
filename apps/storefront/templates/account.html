@@ -3,6 +3,20 @@
 <h1>{{ customer.name }}</h1>
 <p class="muted">{{ customer.email }} &middot; {{ customer.country_code }}
   {% if legacy %}&middot; <span class="tag">legacy pricing</span>{% endif %}</p>
+<h2>Mobile number</h2>
+<p class="muted">We text you the tracking number when an order ships.</p>
+<form method="post" action="/account/mobile" class="mobile-form">
+  <label>
+    Mobile number
+    <input type="tel" name="mobile_number" value="{{ customer.mobile_number or '' }}"
+           placeholder="+1 555 0100">
+  </label>
+  <button type="submit">Save</button>
+</form>
+{% if not customer.mobile_number %}
+<p class="note">No number on file — shipping updates go to {{ customer.email }} only.</p>
+{% endif %}
+
 <h2>Orders</h2>
 {% if not orders %}<p class="muted">No orders yet.</p>{% endif %}
 <table class="lines">

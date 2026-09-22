@@ -50,6 +50,7 @@ CREATE TABLE IF NOT EXISTS customers (
     name          TEXT NOT NULL,
     password_hash TEXT NOT NULL,
     country_code  TEXT NOT NULL DEFAULT 'US',
+    mobile_number TEXT,
     created_at    TEXT NOT NULL DEFAULT (datetime('now'))
 );
 
@@ -212,9 +213,21 @@ def connect() -> sqlite3.Connection:
     return conn
 
 
+# Columns added after a database may already have been created. CREATE TABLE
+# IF NOT EXISTS leaves an existing table alone, so new columns are added here.
+ADDED_COLUMNS = [
+    ("customers", "mobile_number", "TEXT"),
+]
+
+
 def init_schema() -> None:
     with connect() as conn:
         conn.executescript(SCHEMA)
+        for table, column, decl in ADDED_COLUMNS:
+            existing = {row["name"] for row in conn.execute(f"PRAGMA table_info({table})")}
+            if column not in existing:
+                conn.execute(f"ALTER TABLE {table} ADD COLUMN {column} {decl}")
+        conn.commit()
 
 
 def query(sql: str, params: tuple = ()) -> list[dict]:

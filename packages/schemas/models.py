@@ -134,6 +134,7 @@ class Customer(BaseModel):
     email: str
     name: str
     country_code: str = "US"
+    mobile_number: Optional[str] = None
     created_at: datetime
 
 
