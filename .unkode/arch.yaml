@@ -1,6 +1,6 @@
 _meta:
-  last_sync_commit: 6596c38ce74a87a7666eb9e9384811a7814a479c
-  last_sync: "2026-09-18T21:54:48Z"
+  last_sync_commit: a1f435205947ea38b2a4b98144e149a4882d0c48
+  last_sync: "2026-10-13T21:38:42Z"
   version: 1
 
 architecture:
@@ -10,6 +10,15 @@ architecture:
     tech: [Python, FastAPI, Jinja2]
     role: Server-rendered shop where customers browse books, manage a cart, check out and view their orders.
     depends_on: [Business Services, Shared Web Toolkit]
+    components:
+      - name: Storefront Routes
+        path: apps/storefront/routes.py
+        description: Handles browsing, search, cart, checkout, sign-in and account requests and renders the matching page.
+        depends_on: [Storefront Pages, Business Services > Catalog, Business Services > Checkout & Pricing, Business Services > Orders, Business Services > Fulfilment Jobs, Business Services > Customer Identity, Shared Web Toolkit > Templating, Shared Web Toolkit > Form Helpers]
+      - name: Storefront Pages
+        path: apps/storefront/templates
+        description: HTML templates for the catalogue, book detail, cart, checkout, login and account pages.
+        depends_on: [Shared Web Toolkit > Base Layout]
 
   - name: Staff Console
     path: apps/admin
@@ -17,13 +26,35 @@ architecture:
     tech: [Python, FastAPI, Jinja2]
     role: Back-office pages for staff to manage books, inventory, orders, fulfilment jobs, the email outbox and the audit log.
     depends_on: [Business Services, Shared Web Toolkit, Fulfilment Worker]
+    components:
+      - name: Console Routes
+        path: apps/admin/routes.py
+        description: Handles staff actions on books, stock, orders, refunds, jobs and the outbox, recording each in the audit log.
+        depends_on: [Console Pages, Business Services > Audit Trail, Business Services > Catalog, Business Services > Fulfilment Jobs, Business Services > Inventory, Business Services > Notifications, Business Services > Orders, Business Services > Payments, Fulfilment Worker, Shared Web Toolkit > Templating, Shared Web Toolkit > Form Helpers]
+      - name: Console Pages
+        path: apps/admin/templates
+        description: HTML templates for the dashboard, book editor, inventory, orders, jobs, outbox and audit views.
+        depends_on: [Shared Web Toolkit > Base Layout]
 
   - name: Public API
     path: apps/api
     kind: backend
     tech: [Python, FastAPI]
-    role: JSON endpoints for the catalogue, ebook downloads and the Stripe payment webhook.
+    role: Unauthenticated machine-facing endpoints for the partner catalogue feed, the Stripe payment webhook and ebook downloads.
     depends_on: [Business Services, Third-Party Integrations]
+    components:
+      - name: Catalogue Feed
+        path: apps/api/routes.py
+        description: Publishes the book catalogue as a stable JSON contract consumed by partners.
+        depends_on: [Business Services > Catalog]
+      - name: Payment Webhook
+        path: apps/api/routes.py
+        description: Receives signed Stripe payment confirmations and hands them to the payment service.
+        depends_on: [Business Services > Payments]
+      - name: Ebook Download
+        path: apps/api/routes.py
+        description: Serves a purchased ebook file in exchange for a one-off, time-limited download token.
+        depends_on: [Business Services > Fulfilment Jobs, Third-Party Integrations > File Storage Client]
 
   - name: Business Services
     path: services
@@ -34,31 +65,40 @@ architecture:
     components:
       - name: Catalog
         path: services/catalog
-        description: Looks up books and their physical and digital editions.
+        description: Looks up books and their physical and digital editions and resolves cover image URLs.
+        depends_on: [Data Access Layer > Catalogue Repository, Third-Party Integrations > File Storage Client, Domain Schemas]
       - name: Checkout & Pricing
         path: services/checkout
-        description: Manages guest and signed-in carts, prices them and turns them into paid orders.
+        description: Manages guest and signed-in carts, prices them with VAT and legacy discounts, and turns them into paid orders.
+        depends_on: [Catalog, Inventory, Orders, Payments, Customer Identity, Data Access Layer > Cart Repository, Domain Schemas]
       - name: Orders
         path: services/orders
-        description: Creates orders and moves them through their lifecycle.
+        description: Creates orders, moves them through their lifecycle and notifies customers of changes.
+        depends_on: [Notifications, Fulfilment Jobs, Data Access Layer > Order Repository, Domain Schemas]
       - name: Payments
         path: services/payments
-        description: Charges customers through Stripe and reconciles webhook events with orders.
+        description: Charges and refunds customers through Stripe and reconciles webhook events with orders.
+        depends_on: [Orders, Notifications, Data Access Layer > Order Repository, Data Access Layer > Payment Repository, Third-Party Integrations > Payment Client, Domain Schemas]
       - name: Fulfilment Jobs
         path: services/fulfillment
-        description: Queues fulfilment work and manages download grants for ebooks.
+        description: Queues fulfilment and reconciliation jobs and manages download grants for ebooks.
+        depends_on: [Data Access Layer > Fulfilment Repository]
       - name: Inventory
         path: services/inventory
-        description: Tracks stock levels for physical editions.
+        description: Tracks stock levels for physical editions and flags titles that need reordering.
+        depends_on: [Data Access Layer > Inventory Repository]
       - name: Customer Identity
         path: services/identity
-        description: Registers and authenticates customers and manages sessions.
+        description: Registers and authenticates customers, manages sessions and identifies legacy-pricing accounts.
+        depends_on: [Data Access Layer > Customer Repository, Domain Schemas]
       - name: Notifications
         path: services/notifications
-        description: Records and sends transactional emails to customers.
+        description: Records every transactional email in an outbox and sends it to customers.
+        depends_on: [Data Access Layer > Notification Repository, Third-Party Integrations > Email Client]
       - name: Audit Trail
         path: services/audit
         description: Records staff actions for the audit log.
+        depends_on: [Data Access Layer > Audit Repository]
 
   - name: Data Access Layer
     path: data
@@ -66,6 +106,47 @@ architecture:
     tech: [Python, SQLite]
     role: Owns the database schema and connection, and exposes one repository per domain area.
     depends_on: [Bookstore Database]
+    components:
+      - name: Connection & Schema
+        path: data/db.py
+        description: Opens database connections, defines the schema and runs queries for every repository.
+        depends_on: [Bookstore Database]
+      - name: Catalogue Repository
+        path: data/books.py
+        description: Reads and writes books and their editions.
+        depends_on: [Connection & Schema]
+      - name: Cart Repository
+        path: data/carts.py
+        description: Persists the carts of signed-in customers.
+        depends_on: [Connection & Schema]
+      - name: Customer Repository
+        path: data/customers.py
+        description: Stores customer accounts and sessions.
+        depends_on: [Connection & Schema]
+      - name: Order Repository
+        path: data/orders.py
+        description: Stores orders, their line items and status changes.
+        depends_on: [Connection & Schema]
+      - name: Payment Repository
+        path: data/payments.py
+        description: Stores charges, refunds and processed webhook events.
+        depends_on: [Connection & Schema]
+      - name: Fulfilment Repository
+        path: data/fulfillment.py
+        description: Holds the job queue, shipments and ebook download grants.
+        depends_on: [Connection & Schema]
+      - name: Inventory Repository
+        path: data/inventory.py
+        description: Stores stock counts for physical editions.
+        depends_on: [Connection & Schema]
+      - name: Notification Repository
+        path: data/notifications.py
+        description: Stores the outbox of transactional emails.
+        depends_on: [Connection & Schema]
+      - name: Audit Repository
+        path: data/audit.py
+        description: Stores the audit log of staff actions.
+        depends_on: [Connection & Schema]
 
   - name: Third-Party Integrations
     path: integrations
@@ -73,12 +154,38 @@ architecture:
     tech: [Python]
     role: Clients for payments, email and object storage that fall back to local mocks when no credentials are set.
     depends_on: [Stripe, SendGrid, Object Storage]
+    components:
+      - name: Payment Client
+        path: integrations/stripe_client.py
+        description: Creates charges and refunds and verifies and parses payment webhooks.
+        depends_on: [Stripe]
+      - name: Email Client
+        path: integrations/email_client.py
+        description: Delivers transactional email, or reports success without sending in mock mode.
+        depends_on: [SendGrid]
+      - name: File Storage Client
+        path: integrations/storage.py
+        description: Resolves cover URLs and reads ebook files from a bucket or the local filesystem.
+        depends_on: [Object Storage]
 
   - name: Shared Web Toolkit
     path: packages/web
     kind: library
     tech: [Python, Jinja2]
     role: Shared templating setup, base layout and form helpers used by the storefront and staff console.
+    components:
+      - name: Templating
+        path: packages/web/templating.py
+        description: Builds each app's template engine with the shared layout as a fallback and a money formatting filter.
+        depends_on: [Base Layout]
+      - name: Form Helpers
+        path: packages/web/forms.py
+        description: Parses submitted form data and coerces fields to the right types.
+        depends_on: []
+      - name: Base Layout
+        path: packages/web/templates
+        description: The common page shell that every storefront and console page extends.
+        depends_on: []
 
   - name: Domain Schemas
     path: packages/schemas
@@ -97,8 +204,17 @@ architecture:
     path: tools/cli
     kind: cli
     tech: [Python]
-    role: Command-line tool for seeding the database and running fulfilment from the terminal.
+    role: Command-line tool for seeding the database, running fulfilment and reporting store status from the terminal.
     depends_on: [Business Services, Data Access Layer, Fulfilment Worker]
+    components:
+      - name: Command Dispatcher
+        path: tools/cli/__main__.py
+        description: Runs the seed, fulfil, reconcile and status commands.
+        depends_on: [Demo Data Seeder, Fulfilment Worker, Data Access Layer > Connection & Schema, Business Services > Catalog, Business Services > Fulfilment Jobs, Business Services > Inventory, Business Services > Orders]
+      - name: Demo Data Seeder
+        path: tools/cli/seeder.py
+        description: Loads the book catalogue, demo customers and sample orders from the seed file.
+        depends_on: [Data Access Layer > Catalogue Repository, Data Access Layer > Customer Repository, Data Access Layer > Inventory Repository, Data Access Layer > Order Repository, Data Access Layer > Payment Repository, Business Services > Customer Identity]
 
   - name: Bookstore Database
     type: external
@@ -108,7 +224,7 @@ architecture:
   - name: Stripe
     type: external
     kind: api
-    role: Payment gateway for card charges and payment webhooks.
+    role: Payment gateway for card charges, refunds and payment webhooks.
 
   - name: SendGrid
     type: external
