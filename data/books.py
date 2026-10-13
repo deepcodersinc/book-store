@@ -3,18 +3,46 @@
 from data import db
 
 
-def list_books(search: str | None = None, limit: int = 50) -> list[dict]:
+# Orderings the listing supports. Never interpolate anything else into the
+# query — the caller's sort key only ever selects one of these clauses.
+# Books with no edition have no price, so they sort last either way, and every
+# clause breaks ties on title to keep the order stable.
+SORT_CLAUSES = {
+    "title_asc": "lower(b.title)",
+    "author_asc": "lower(b.author), lower(b.title)",
+    "price_asc": "min_price_cents IS NULL, min_price_cents ASC, lower(b.title)",
+    "price_desc": "min_price_cents IS NULL, min_price_cents DESC, lower(b.title)",
+}
+
+DEFAULT_SORT = "title_asc"
+
+
+def list_books(search: str | None = None, limit: int = 50,
+               sort: str = DEFAULT_SORT) -> list[dict]:
+    """Catalogue listing. Sorting happens here, before the limit, so a price
+    ordering surfaces the cheapest books in the shop rather than reshuffling
+    the alphabetically first ones."""
+    order_by = SORT_CLAUSES.get(sort, SORT_CLAUSES[DEFAULT_SORT])
+    price = "(SELECT MIN(price_cents) FROM editions e WHERE e.book_id = b.id)"
     if search:
         pattern = f"%{search.lower()}%"
         return db.query(
-            """
-            SELECT * FROM books
-            WHERE lower(title) LIKE ? OR lower(author) LIKE ?
-            ORDER BY title LIMIT ?
+            f"""
+            SELECT b.*, {price} AS min_price_cents
+            FROM books b
+            WHERE lower(b.title) LIKE ? OR lower(b.author) LIKE ?
+            ORDER BY {order_by} LIMIT ?
             """,
             (pattern, pattern, limit),
         )
-    return db.query("SELECT * FROM books ORDER BY title LIMIT ?", (limit,))
+    return db.query(
+        f"""
+        SELECT b.*, {price} AS min_price_cents
+        FROM books b
+        ORDER BY {order_by} LIMIT ?
+        """,
+        (limit,),
+    )
 
 
 def get_book(book_id: int) -> dict | None:

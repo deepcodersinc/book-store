@@ -36,9 +36,28 @@ def _to_book(row: dict, editions: list[dict] | None = None) -> Book:
     )
 
 
-def browse(search: str | None = None, limit: int = 50) -> list[Book]:
+# How a shopper may order the listing, in the order the choices are offered.
+SORT_OPTIONS = [
+    ("title_asc", "Name, A–Z"),
+    ("author_asc", "Author, A–Z"),
+    ("price_asc", "Price, low to high"),
+    ("price_desc", "Price, high to low"),
+]
+
+DEFAULT_SORT = book_repo.DEFAULT_SORT
+
+
+def normalise_sort(sort: str | None) -> str:
+    """Fall back to the default rather than erroring on an unknown ordering."""
+    keys = {key for key, _ in SORT_OPTIONS}
+    return sort if sort in keys else DEFAULT_SORT
+
+
+def browse(search: str | None = None, limit: int = 50,
+           sort: str = DEFAULT_SORT) -> list[Book]:
     """Catalogue listing, with editions attached so prices can be shown."""
-    rows = book_repo.list_books(search=search, limit=limit)
+    rows = book_repo.list_books(search=search, limit=limit,
+                                sort=normalise_sort(sort))
     return [_to_book(row, book_repo.editions_for_book(row["id"])) for row in rows]
 
 

@@ -4,6 +4,13 @@
   <h1>Second-hand classics, carefully kept</h1>
   <p>Paperbacks, hardcovers, and instant downloads.</p>
 </section>
+<nav class="sortbar" aria-label="Sort books">
+  <span>Sort</span>
+  {% for key, label in sort_options %}
+  <a href="?sort={{ key }}" class="pill{% if key == sort %} active{% endif %}"
+     {% if key == sort %}aria-current="page"{% endif %}>{{ label }}</a>
+  {% endfor %}
+</nav>
 <div class="grid">
   {% for book in books %}
   <article class="card">
