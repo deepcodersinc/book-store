@@ -12,17 +12,7 @@ graph LR
         Fulfilment_Worker[\"Fulfilment Worker (Python)"/]
         Operations_CLI>"Operations CLI (Python)"]
     end
-    subgraph Business_Services["Business Services (Python)"]
-        Business_Services_Catalog["Catalog"]
-        Business_Services_Checkout___Pricing["Checkout & Pricing"]
-        Business_Services_Orders["Orders"]
-        Business_Services_Payments["Payments"]
-        Business_Services_Fulfilment_Jobs["Fulfilment Jobs"]
-        Business_Services_Inventory["Inventory"]
-        Business_Services_Customer_Identity["Customer Identity"]
-        Business_Services_Notifications["Notifications"]
-        Business_Services_Audit_Trail["Audit Trail"]
-    end
+    Business_Services["Business Services (Python)"]
     Data_Access_Layer(["Data Access Layer (Python, SQLite)"])
     Third_Party_Integrations(["Third-Party Integrations (Python)"])
     Shared_Web_Toolkit(["Shared Web Toolkit (Python, Jinja2)"])
@@ -31,8 +21,8 @@ graph LR
     Bookstore_Database[("Bookstore Database")]
     Stripe[["Stripe"]]
     SendGrid[["SendGrid"]]
-    Object_Storage[("Object Storage")]
     Twilio[["Twilio"]]
+    Object_Storage[("Object Storage")]
 
     Customer_Storefront --> Business_Services
     Customer_Storefront --> Shared_Web_Toolkit
@@ -59,6 +49,134 @@ graph LR
 
 ---
 
+## Components
+
+How work moves through the system. Modules that have components are drawn as containers.
+
+<details>
+<summary>Show the component diagram</summary>
+
+```mermaid
+%%{init: {'theme':'neutral'}}%%
+graph LR
+    Customer_Storefront[/"Customer Storefront (Python, FastAPI, Jinja2)"\]
+    Staff_Console[/"Staff Console (Python, FastAPI, Jinja2)"\]
+    Public_API["Public API (Python, FastAPI)"]
+    subgraph Business_Services["Business Services (Python)"]
+        Business_Services_Catalog["Catalog"]
+        Business_Services_Checkout___Pricing["Checkout & Pricing"]
+        Business_Services_Orders["Orders"]
+        Business_Services_Payments["Payments"]
+        Business_Services_Fulfilment_Jobs["Fulfilment Jobs"]
+        Business_Services_Inventory["Inventory"]
+        Business_Services_Customer_Identity["Customer Identity"]
+        Business_Services_Notifications["Notifications"]
+        Business_Services_Audit_Trail["Audit Trail"]
+    end
+    subgraph Data_Access_Layer["Data Access Layer (Python, SQLite)"]
+        Data_Access_Layer_Database_Connection___Schema(["Database Connection & Schema"])
+        Data_Access_Layer_Book_Repository(["Book Repository"])
+        Data_Access_Layer_Inventory_Repository(["Inventory Repository"])
+        Data_Access_Layer_Customer_Repository(["Customer Repository"])
+        Data_Access_Layer_Cart_Repository(["Cart Repository"])
+        Data_Access_Layer_Order_Repository(["Order Repository"])
+        Data_Access_Layer_Payment_Repository(["Payment Repository"])
+        Data_Access_Layer_Fulfilment_Repository(["Fulfilment Repository"])
+        Data_Access_Layer_Outbox_Repository(["Outbox Repository"])
+        Data_Access_Layer_Audit_Log_Repository(["Audit Log Repository"])
+    end
+    subgraph Third_Party_Integrations["Third-Party Integrations (Python)"]
+        Third_Party_Integrations_Payment_Client(["Payment Client"])
+        Third_Party_Integrations_Email_Client(["Email Client"])
+        Third_Party_Integrations_SMS_Client(["SMS Client"])
+        Third_Party_Integrations_File_Storage(["File Storage"])
+    end
+    Shared_Web_Toolkit(["Shared Web Toolkit (Python, Jinja2)"])
+    Domain_Schemas(["Domain Schemas (Python, Pydantic)"])
+    Fulfilment_Worker[\"Fulfilment Worker (Python)"/]
+    subgraph Operations_CLI["Operations CLI (Python)"]
+        Operations_CLI_Command_Runner>"Command Runner"]
+        Operations_CLI_Demo_Data_Seeder>"Demo Data Seeder"]
+    end
+
+    Bookstore_Database[("Bookstore Database")]
+    Stripe[["Stripe"]]
+    SendGrid[["SendGrid"]]
+    Twilio[["Twilio"]]
+    Object_Storage[("Object Storage")]
+
+    Customer_Storefront --> Business_Services
+    Customer_Storefront --> Shared_Web_Toolkit
+    Staff_Console --> Business_Services
+    Staff_Console --> Shared_Web_Toolkit
+    Staff_Console --> Fulfilment_Worker
+    Public_API --> Business_Services
+    Public_API --> Third_Party_Integrations
+    Business_Services_Catalog --> Data_Access_Layer_Book_Repository
+    Business_Services_Catalog --> Third_Party_Integrations_File_Storage
+    Business_Services_Catalog --> Domain_Schemas
+    Business_Services_Checkout___Pricing --> Business_Services_Catalog
+    Business_Services_Checkout___Pricing --> Business_Services_Inventory
+    Business_Services_Checkout___Pricing --> Business_Services_Orders
+    Business_Services_Checkout___Pricing --> Business_Services_Payments
+    Business_Services_Checkout___Pricing --> Business_Services_Customer_Identity
+    Business_Services_Checkout___Pricing --> Data_Access_Layer_Cart_Repository
+    Business_Services_Checkout___Pricing --> Domain_Schemas
+    Business_Services_Orders --> Business_Services_Notifications
+    Business_Services_Orders --> Business_Services_Fulfilment_Jobs
+    Business_Services_Orders --> Data_Access_Layer_Order_Repository
+    Business_Services_Orders --> Domain_Schemas
+    Business_Services_Payments --> Business_Services_Orders
+    Business_Services_Payments --> Business_Services_Notifications
+    Business_Services_Payments --> Data_Access_Layer_Order_Repository
+    Business_Services_Payments --> Data_Access_Layer_Payment_Repository
+    Business_Services_Payments --> Third_Party_Integrations_Payment_Client
+    Business_Services_Payments --> Domain_Schemas
+    Business_Services_Fulfilment_Jobs --> Data_Access_Layer_Fulfilment_Repository
+    Business_Services_Inventory --> Data_Access_Layer_Inventory_Repository
+    Business_Services_Customer_Identity --> Data_Access_Layer_Customer_Repository
+    Business_Services_Customer_Identity --> Domain_Schemas
+    Business_Services_Notifications --> Business_Services_Customer_Identity
+    Business_Services_Notifications --> Data_Access_Layer_Outbox_Repository
+    Business_Services_Notifications --> Third_Party_Integrations_Email_Client
+    Business_Services_Notifications --> Third_Party_Integrations_SMS_Client
+    Business_Services_Audit_Trail --> Data_Access_Layer_Audit_Log_Repository
+    Data_Access_Layer_Database_Connection___Schema --> Bookstore_Database
+    Data_Access_Layer_Book_Repository --> Data_Access_Layer_Database_Connection___Schema
+    Data_Access_Layer_Inventory_Repository --> Data_Access_Layer_Database_Connection___Schema
+    Data_Access_Layer_Customer_Repository --> Data_Access_Layer_Database_Connection___Schema
+    Data_Access_Layer_Cart_Repository --> Data_Access_Layer_Database_Connection___Schema
+    Data_Access_Layer_Order_Repository --> Data_Access_Layer_Database_Connection___Schema
+    Data_Access_Layer_Payment_Repository --> Data_Access_Layer_Database_Connection___Schema
+    Data_Access_Layer_Fulfilment_Repository --> Data_Access_Layer_Database_Connection___Schema
+    Data_Access_Layer_Outbox_Repository --> Data_Access_Layer_Database_Connection___Schema
+    Data_Access_Layer_Audit_Log_Repository --> Data_Access_Layer_Database_Connection___Schema
+    Third_Party_Integrations_Payment_Client --> Stripe
+    Third_Party_Integrations_Email_Client --> SendGrid
+    Third_Party_Integrations_SMS_Client --> Twilio
+    Third_Party_Integrations_File_Storage --> Object_Storage
+    Fulfilment_Worker --> Business_Services
+    Fulfilment_Worker --> Data_Access_Layer
+    Fulfilment_Worker --> Domain_Schemas
+    Operations_CLI_Command_Runner --> Operations_CLI_Demo_Data_Seeder
+    Operations_CLI_Command_Runner --> Business_Services_Catalog
+    Operations_CLI_Command_Runner --> Business_Services_Fulfilment_Jobs
+    Operations_CLI_Command_Runner --> Business_Services_Inventory
+    Operations_CLI_Command_Runner --> Business_Services_Orders
+    Operations_CLI_Command_Runner --> Data_Access_Layer_Database_Connection___Schema
+    Operations_CLI_Command_Runner --> Fulfilment_Worker
+    Operations_CLI_Demo_Data_Seeder --> Business_Services_Customer_Identity
+    Operations_CLI_Demo_Data_Seeder --> Data_Access_Layer_Book_Repository
+    Operations_CLI_Demo_Data_Seeder --> Data_Access_Layer_Customer_Repository
+    Operations_CLI_Demo_Data_Seeder --> Data_Access_Layer_Inventory_Repository
+    Operations_CLI_Demo_Data_Seeder --> Data_Access_Layer_Order_Repository
+    Operations_CLI_Demo_Data_Seeder --> Data_Access_Layer_Payment_Repository
+```
+
+</details>
+
+---
+
 ### Customer Storefront `Python, FastAPI, Jinja2`
 
 Server-rendered shop where customers browse books, manage a cart, check out and view their orders.
@@ -70,7 +188,7 @@ Server-rendered shop where customers browse books, manage a cart, check out and 
 
 ### Staff Console `Python, FastAPI, Jinja2`
 
-Back-office pages for staff to manage books, inventory, orders, fulfilment jobs, the email outbox and the audit log.
+Back-office pages for staff to manage books, inventory, orders, fulfilment jobs, the message outbox and the audit log.
 
 **Path:** `apps/admin`
 
@@ -94,14 +212,14 @@ Domain logic for the bookshop, sitting between the web layer and the data reposi
 
 **Depends on:** Data Access Layer, Third-Party Integrations, Domain Schemas
 
-- **Catalog** — Looks up books and their physical and digital editions.
+- **Catalog** — Looks up books, their physical and digital editions, and bestseller lists.
 - **Checkout & Pricing** — Manages guest and signed-in carts, prices them and turns them into paid orders.
 - **Orders** — Creates orders and moves them through their lifecycle.
 - **Payments** — Charges customers through Stripe and reconciles webhook events with orders.
 - **Fulfilment Jobs** — Queues fulfilment work and manages download grants for ebooks.
 - **Inventory** — Tracks stock levels for physical editions.
 - **Customer Identity** — Registers and authenticates customers and manages sessions.
-- **Notifications** — Records and sends transactional emails to customers.
+- **Notifications** — Records and sends transactional emails and text messages to customers.
 - **Audit Trail** — Records staff actions for the audit log.
 
 ### Data Access Layer `Python, SQLite`
@@ -112,6 +230,16 @@ Owns the database schema and connection, and exposes one repository per domain a
 
 **Depends on:** Bookstore Database
 
+- **Database Connection & Schema** — Opens the database connection, runs queries and creates the schema.
+- **Book Repository** — Reads and writes books and editions, and ranks bestsellers from paid orders.
+- **Inventory Repository** — Reads and adjusts stock levels for physical editions.
+- **Customer Repository** — Stores customer accounts and login sessions.
+- **Cart Repository** — Persists carts for signed-in shoppers.
+- **Order Repository** — Stores orders, their line items and status changes.
+- **Payment Repository** — Stores payment and refund records.
+- **Fulfilment Repository** — Stores shipments, ebook download grants and the background job queue.
+- **Outbox Repository** — Records every email and text message sent to customers.
+- **Audit Log Repository** — Stores the audit trail of staff actions.
 
 ### Third-Party Integrations `Python`
 
@@ -121,6 +249,10 @@ Clients for payments, email, text messages and object storage that fall back to 
 
 **Depends on:** Stripe, SendGrid, Twilio, Object Storage
 
+- **Payment Client** — Creates charges and refunds and verifies payment webhook signatures.
+- **Email Client** — Sends transactional emails.
+- **SMS Client** — Sends text messages.
+- **File Storage** — Resolves and reads cover images and ebook files from a bucket or local disk.
 
 ### Shared Web Toolkit `Python, Jinja2`
 
@@ -153,6 +285,8 @@ Command-line tool for seeding the database and running fulfilment from the termi
 
 **Depends on:** Business Services, Data Access Layer, Fulfilment Worker
 
+- **Command Runner** — Parses terminal commands and dispatches them to seeding, stock and fulfilment operations.
+- **Demo Data Seeder** — Loads the demo catalogue, customer accounts and order history.
 
 ---
 
@@ -170,9 +304,13 @@ graph TB
         Fulfilment_Worker_Container_Fulfilment_Worker["Fulfilment Worker"]
         Fulfilment_Worker_Container_Operations_CLI["Operations CLI"]
     end
-    PostgreSQL[("PostgreSQL (Docker Compose, postgres:16)")]
+    subgraph PostgreSQL["PostgreSQL (Docker Compose, postgres:16)"]
+        PostgreSQL_Bookstore_Database["Bookstore Database"]
+    end
     Redis[("Redis (Docker Compose, redis:7)")]
-    MinIO[("MinIO (Docker Compose, minio)")]
+    subgraph MinIO["MinIO (Docker Compose, minio)"]
+        MinIO_Object_Storage["Object Storage"]
+    end
 
     Web_App_Container --> PostgreSQL
     Web_App_Container --> Redis
@@ -192,9 +330,11 @@ graph TB
 
 **PostgreSQL** `Docker Compose, postgres:16`
 : Database server declared in the compose topology.
+  Hosts: Bookstore Database
 
 **Redis** `Docker Compose, redis:7`
-: Cache server declared in the compose topology.
+: Cache server declared in the compose topology but not used by any code.
 
 **MinIO** `Docker Compose, minio`
 : S3-compatible object store for covers and ebook files.
+  Hosts: Object Storage

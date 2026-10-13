@@ -1,6 +1,6 @@
 _meta:
-  last_sync_commit: 21019f0f199b585128de65e80eef98db1c1725d8
-  last_sync: "2026-09-22T21:06:47Z"
+  last_sync_commit: 67087e09ccc4855c2859dc6bd9ee7bece16782b7
+  last_sync: "2026-09-27T19:39:05Z"
   version: 1
 
 architecture:
@@ -15,7 +15,7 @@ architecture:
     path: apps/admin
     kind: frontend
     tech: [Python, FastAPI, Jinja2]
-    role: Back-office pages for staff to manage books, inventory, orders, fulfilment jobs, the email outbox and the audit log.
+    role: Back-office pages for staff to manage books, inventory, orders, fulfilment jobs, the message outbox and the audit log.
     depends_on: [Business Services, Shared Web Toolkit, Fulfilment Worker]
 
   - name: Public API
@@ -34,31 +34,40 @@ architecture:
     components:
       - name: Catalog
         path: services/catalog
-        description: Looks up books and their physical and digital editions.
+        description: Looks up books, their physical and digital editions, and bestseller lists.
+        depends_on: [Data Access Layer > Book Repository, Third-Party Integrations > File Storage, Domain Schemas]
       - name: Checkout & Pricing
         path: services/checkout
         description: Manages guest and signed-in carts, prices them and turns them into paid orders.
+        depends_on: [Catalog, Inventory, Orders, Payments, Customer Identity, Data Access Layer > Cart Repository, Domain Schemas]
       - name: Orders
         path: services/orders
         description: Creates orders and moves them through their lifecycle.
+        depends_on: [Notifications, Fulfilment Jobs, Data Access Layer > Order Repository, Domain Schemas]
       - name: Payments
         path: services/payments
         description: Charges customers through Stripe and reconciles webhook events with orders.
+        depends_on: [Orders, Notifications, Data Access Layer > Order Repository, Data Access Layer > Payment Repository, Third-Party Integrations > Payment Client, Domain Schemas]
       - name: Fulfilment Jobs
         path: services/fulfillment
         description: Queues fulfilment work and manages download grants for ebooks.
+        depends_on: [Data Access Layer > Fulfilment Repository]
       - name: Inventory
         path: services/inventory
         description: Tracks stock levels for physical editions.
+        depends_on: [Data Access Layer > Inventory Repository]
       - name: Customer Identity
         path: services/identity
         description: Registers and authenticates customers and manages sessions.
+        depends_on: [Data Access Layer > Customer Repository, Domain Schemas]
       - name: Notifications
         path: services/notifications
-        description: Records and sends transactional emails to customers.
+        description: Records and sends transactional emails and text messages to customers.
+        depends_on: [Customer Identity, Data Access Layer > Outbox Repository, Third-Party Integrations > Email Client, Third-Party Integrations > SMS Client]
       - name: Audit Trail
         path: services/audit
         description: Records staff actions for the audit log.
+        depends_on: [Data Access Layer > Audit Log Repository]
 
   - name: Data Access Layer
     path: data
@@ -66,6 +75,47 @@ architecture:
     tech: [Python, SQLite]
     role: Owns the database schema and connection, and exposes one repository per domain area.
     depends_on: [Bookstore Database]
+    components:
+      - name: Database Connection & Schema
+        path: data/db.py
+        description: Opens the database connection, runs queries and creates the schema.
+        depends_on: [Bookstore Database]
+      - name: Book Repository
+        path: data/books.py
+        description: Reads and writes books and editions, and ranks bestsellers from paid orders.
+        depends_on: [Database Connection & Schema]
+      - name: Inventory Repository
+        path: data/inventory.py
+        description: Reads and adjusts stock levels for physical editions.
+        depends_on: [Database Connection & Schema]
+      - name: Customer Repository
+        path: data/customers.py
+        description: Stores customer accounts and login sessions.
+        depends_on: [Database Connection & Schema]
+      - name: Cart Repository
+        path: data/carts.py
+        description: Persists carts for signed-in shoppers.
+        depends_on: [Database Connection & Schema]
+      - name: Order Repository
+        path: data/orders.py
+        description: Stores orders, their line items and status changes.
+        depends_on: [Database Connection & Schema]
+      - name: Payment Repository
+        path: data/payments.py
+        description: Stores payment and refund records.
+        depends_on: [Database Connection & Schema]
+      - name: Fulfilment Repository
+        path: data/fulfillment.py
+        description: Stores shipments, ebook download grants and the background job queue.
+        depends_on: [Database Connection & Schema]
+      - name: Outbox Repository
+        path: data/notifications.py
+        description: Records every email and text message sent to customers.
+        depends_on: [Database Connection & Schema]
+      - name: Audit Log Repository
+        path: data/audit.py
+        description: Stores the audit trail of staff actions.
+        depends_on: [Database Connection & Schema]
 
   - name: Third-Party Integrations
     path: integrations
@@ -73,6 +123,23 @@ architecture:
     tech: [Python]
     role: Clients for payments, email, text messages and object storage that fall back to local mocks when no credentials are set.
     depends_on: [Stripe, SendGrid, Twilio, Object Storage]
+    components:
+      - name: Payment Client
+        path: integrations/stripe_client.py
+        description: Creates charges and refunds and verifies payment webhook signatures.
+        depends_on: [Stripe]
+      - name: Email Client
+        path: integrations/email_client.py
+        description: Sends transactional emails.
+        depends_on: [SendGrid]
+      - name: SMS Client
+        path: integrations/sms_client.py
+        description: Sends text messages.
+        depends_on: [Twilio]
+      - name: File Storage
+        path: integrations/storage.py
+        description: Resolves and reads cover images and ebook files from a bucket or local disk.
+        depends_on: [Object Storage]
 
   - name: Shared Web Toolkit
     path: packages/web
@@ -99,31 +166,40 @@ architecture:
     tech: [Python]
     role: Command-line tool for seeding the database and running fulfilment from the terminal.
     depends_on: [Business Services, Data Access Layer, Fulfilment Worker]
+    components:
+      - name: Command Runner
+        path: tools/cli/__main__.py
+        description: Parses terminal commands and dispatches them to seeding, stock and fulfilment operations.
+        depends_on: [Demo Data Seeder, Business Services > Catalog, Business Services > Fulfilment Jobs, Business Services > Inventory, Business Services > Orders, Data Access Layer > Database Connection & Schema, Fulfilment Worker]
+      - name: Demo Data Seeder
+        path: tools/cli/seeder.py
+        description: Loads the demo catalogue, customer accounts and order history.
+        depends_on: [Business Services > Customer Identity, Data Access Layer > Book Repository, Data Access Layer > Customer Repository, Data Access Layer > Inventory Repository, Data Access Layer > Order Repository, Data Access Layer > Payment Repository]
 
   - name: Bookstore Database
     type: external
     kind: database
-    role: Stores the catalogue, carts, orders, payments, inventory and the job queue in a single SQLite database file.
+    role: Stores the catalogue, carts, orders, payments, inventory and the job queue.
 
   - name: Stripe
     type: external
     kind: api
-    role: Payment gateway for card charges and payment webhooks.
+    role: Payment gateway for card charges, refunds and payment webhooks.
 
   - name: SendGrid
     type: external
     kind: api
     role: Delivers transactional customer emails.
 
-  - name: Object Storage
-    type: external
-    kind: storage
-    role: S3-compatible bucket for cover images and ebook files, with the local filesystem as the fallback.
-
   - name: Twilio
     type: external
     kind: api
     role: Sends customers shipping updates by text message.
+
+  - name: Object Storage
+    type: external
+    kind: storage
+    role: S3-compatible bucket for cover images and ebook files, with the local filesystem as the fallback.
 
 deployment:
   - name: Web App Container
@@ -141,11 +217,13 @@ deployment:
   - name: PostgreSQL
     tech: [Docker Compose, postgres:16]
     role: Database server declared in the compose topology.
+    hosts: [Bookstore Database]
 
   - name: Redis
     tech: [Docker Compose, redis:7]
-    role: Cache server declared in the compose topology.
+    role: Cache server declared in the compose topology but not used by any code.
 
   - name: MinIO
     tech: [Docker Compose, minio]
     role: S3-compatible object store for covers and ebook files.
+    hosts: [Object Storage]
